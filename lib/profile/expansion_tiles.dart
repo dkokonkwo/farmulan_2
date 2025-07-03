@@ -1,0 +1,103 @@
+import 'package:farmulan_2/profile/feedback.dart';
+import 'package:farmulan_2/profile/location.dart';
+import 'package:farmulan_2/profile/personal_form.dart';
+import 'package:farmulan_2/utils/constants/colors.dart';
+import 'package:farmulan_2/utils/constants/icons.dart';
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+
+class ProfileExpansionTiles extends StatefulWidget {
+  const ProfileExpansionTiles({super.key});
+
+  @override
+  State<ProfileExpansionTiles> createState() => _ProfileExpansionTilesState();
+}
+
+class _ProfileExpansionTilesState extends State<ProfileExpansionTiles> {
+  final List<String> profileTitles = ['Personal', 'Farm', 'Feedback', 'Logout'];
+  final List<String> profileSubheadings = [
+    'Update your personal details',
+    'Update farm information',
+    'Contact us for support',
+    'Sign out of your account',
+  ];
+  final List<IconData> profileIcons = [
+    AppIcons.personal,
+    AppIcons.tractor,
+    AppIcons.feedback,
+    AppIcons.logout,
+  ];
+
+  final List<Widget> tileBodyList = [
+    FormContainer(),
+    LocationPicker(),
+    FeedbackForm(),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      spacing: 8.0,
+      children: List.generate(4, (index) {
+        return ExpansionTile(
+          title: Text(
+            profileTitles[index],
+            style: GoogleFonts.zenKakuGothicAntique(
+              textStyle: TextStyle(
+                fontSize: 17,
+                fontWeight: FontWeight.bold,
+                color: AppColors.regularText.withValues(alpha: 0.8),
+              ),
+            ),
+          ),
+          subtitle: Text(
+            profileSubheadings[index],
+            style: GoogleFonts.zenKakuGothicAntique(
+              textStyle: TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.normal,
+                fontStyle: FontStyle.italic,
+                color: AppColors.regularText.withValues(alpha: 0.5),
+              ),
+            ),
+          ),
+          showTrailingIcon: index != 3,
+          leading: ExpansionLeadingIcon(icon: profileIcons[index]),
+          children: [?index != 3 ? tileBodyList[index] : null],
+        );
+      }),
+    );
+  }
+}
+
+class ExpansionLeadingIcon extends StatelessWidget {
+  final IconData icon;
+  const ExpansionLeadingIcon({super.key, required this.icon});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        gradient: LinearGradient(
+          colors: [Color(0xffDBE0E7), Color(0xffF8FBFF)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomCenter,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Color(0xff3B4056).withValues(alpha: 0.1),
+            blurRadius: 10,
+            offset: Offset(4, 4),
+          ),
+        ],
+      ),
+      child: Icon(
+        icon,
+        color: AppColors.regularText.withValues(alpha: 0.4),
+        size: 16,
+      ),
+    );
+  }
+}
