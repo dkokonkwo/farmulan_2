@@ -140,7 +140,7 @@ class NeumorphicBottomButton extends StatelessWidget {
             shape: BoxShape.circle,
             gradient: LinearGradient(
               colors: isSelected
-                  ? [Color(0xffD99AFA), Color(0xffBA3D4F)]
+                  ? [Color(0xff6197a8), Color(0xFF49DA57)]
                   : [AppColors.bottomShadow, AppColors.bottomShadow],
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,

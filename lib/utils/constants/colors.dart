@@ -38,12 +38,14 @@ class AppColors {
   static const Color pageBackground = Color(0xffEFF1F5);
   static const Color pageHeadingText = Color(0xff4C7380);
   static const Color regularText = Color(0xff3C3C43);
+  static const Color counterShade = Color(0xffCBB8FF);
+  static const Color counterShade2 = Color(0xffFFC4B3);
 
   static const Color topShadow = Colors.white;
   static const Color bottomShadow = Color(0xffDDE1E7);
 
-  static const Color primaryPurple = Color(0xff985EE1);
-  static const Color primaryRed = Color(0xffF25656);
+  static const Color primaryPurple = Color(0xff4C7380);
+  static const Color primaryRed = Color(0xFF3CB648);
 }
 
 extension ColorExtension on Color {
