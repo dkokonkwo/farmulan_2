@@ -6,7 +6,7 @@
 
 ## Project Overview
 
-Welcome to Farmulan 2! This is a Flutter project designed to [briefly describe what your app does, e.g., "help farmers manage their crops," "provide real-time market prices for agricultural products," etc.].
+Welcome to Farmulan! This is a Flutter project designed to help farmers manage their crops, and provide real-time sensor data from on-farm sensors.
 
 ## Getting Started
 
@@ -31,7 +31,7 @@ Follow these steps to get your project up and running:
 1.  **Clone the repository:**
 
     ```bash
-    git clone [https://github.com/your-username/farmulan_2.git](https://github.com/your-username/farmulan_2.git) # Replace with your actual repository URL
+    git clone [https://github.com/your-username/farmulan_2.git](https://github.com/dkokonkwo/farmulan_2.git)
     cd farmulan_2
     ```
 
