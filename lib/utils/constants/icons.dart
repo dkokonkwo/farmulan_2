@@ -37,4 +37,5 @@ class AppIcons {
   static IconData logout = Iconsax.logout;
   static IconData send = Icons.send;
   static IconData update = Iconsax.global_edit;
+  static IconData gps = Iconsax.gps;
 }

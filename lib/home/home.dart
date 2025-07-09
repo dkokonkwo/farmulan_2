@@ -6,7 +6,8 @@ import 'package:farmulan_2/utils/constants/icons.dart';
 import 'package:flutter/material.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  final ValueChanged<int> navCallback;
+  const HomePage({super.key, required this.navCallback});
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -50,7 +51,7 @@ class _HomePageState extends State<HomePage> {
           children: [
             SizedBox(height: 10),
             WeatherInfo(),
-            SizedBox(height: 20),
+            SizedBox(height: 30),
             HomeCarousel(),
             SizedBox(height: 25),
             Wrap(

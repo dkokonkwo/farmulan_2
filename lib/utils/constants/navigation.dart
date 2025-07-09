@@ -17,7 +17,7 @@ class _MyNavBarState extends State<MyNavBar> {
   int _currentIndex = 0;
 
   late final List<Widget> _screens = [
-    const HomePage(),
+    HomePage(navCallback: changeTab),
     const FarmPage(),
     const ProfilePage(),
   ];

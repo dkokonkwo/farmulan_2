@@ -1,5 +1,4 @@
 import 'package:farmulan_2/farm/farm.dart';
-import 'package:farmulan_2/home/home.dart';
 import 'package:farmulan_2/profile/profile.dart';
 import 'package:farmulan_2/utils/constants/colors.dart';
 import 'package:farmulan_2/utils/constants/icons.dart';
@@ -19,7 +18,7 @@ class _GNavBarState extends State<GNavBar> {
   int _currentIndex = 0;
 
   late final List<Widget> _screens = [
-    const HomePage(),
+    // const HomePage(),
     const FarmPage(),
     const ProfilePage(),
   ];

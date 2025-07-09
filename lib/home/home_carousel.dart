@@ -1,4 +1,5 @@
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:farmulan_2/farm/updated_bar_chart.dart';
 import 'package:farmulan_2/home/home_banner.dart';
 import 'package:farmulan_2/utils/constants/colors.dart';
 import 'package:farmulan_2/utils/constants/sensor_chart.dart';
@@ -14,7 +15,7 @@ class HomeCarousel extends StatefulWidget {
 class _HomeCarouselState extends State<HomeCarousel> {
   int _currentIndex = 0;
 
-  final List<Widget> _items = const [HomeBanner(), ChartWrapper()];
+  final List<Widget> _items = const [HomeBanner(), UpdatedBarChart()];
 
   @override
   Widget build(BuildContext context) {
