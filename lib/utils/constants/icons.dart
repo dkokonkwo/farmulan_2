@@ -38,4 +38,7 @@ class AppIcons {
   static IconData send = Icons.send;
   static IconData update = Iconsax.global_edit;
   static IconData gps = Iconsax.gps;
+
+  static IconData sms = Iconsax.sms;
+  static IconData eyeSlash = Iconsax.eye_slash;
 }

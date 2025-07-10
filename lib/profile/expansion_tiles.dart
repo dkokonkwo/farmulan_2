@@ -1,8 +1,10 @@
+import 'package:farmulan_2/authentication/auth.dart';
 import 'package:farmulan_2/profile/feedback.dart';
 import 'package:farmulan_2/profile/location.dart';
 import 'package:farmulan_2/profile/personal_form.dart';
 import 'package:farmulan_2/utils/constants/colors.dart';
 import 'package:farmulan_2/utils/constants/icons.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -14,6 +16,12 @@ class ProfileExpansionTiles extends StatefulWidget {
 }
 
 class _ProfileExpansionTilesState extends State<ProfileExpansionTiles> {
+  final User? user = Auth().currentUser;
+
+  Future<void> signOut() async {
+    await Auth().signOut();
+  }
+
   final List<String> profileTitles = ['Personal', 'Farm', 'Feedback', 'Logout'];
   final List<String> profileSubheadings = [
     'Update your personal details',
@@ -64,6 +72,9 @@ class _ProfileExpansionTilesState extends State<ProfileExpansionTiles> {
           showTrailingIcon: index != 3,
           leading: ExpansionLeadingIcon(icon: profileIcons[index]),
           children: [?index != 3 ? tileBodyList[index] : null],
+          onExpansionChanged: (bool expanded) {
+            index == 3 && expanded ? signOut : null;
+          },
         );
       }),
     );

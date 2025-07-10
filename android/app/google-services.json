@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "619941529338",
+    "firebase_url": "https://iot-farminc-default-rtdb.firebaseio.com",
+    "project_id": "iot-farminc",
+    "storage_bucket": "iot-farminc.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:619941529338:android:690b203f9d18b5c4b02b43",
+        "android_client_info": {
+          "package_name": "com.example.farmulan_2"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA_Sy_1eUnpLtHvtbq5_GqbDkSkvXA_AYY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

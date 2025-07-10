@@ -1,17 +1,21 @@
+import 'package:farmulan_2/authentication/auth.dart';
 import 'package:farmulan_2/utils/constants/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class FormField extends StatefulWidget {
-  final String fieldName;
-  const FormField({super.key, required this.fieldName});
+class CustomTextField extends StatelessWidget {
+  final String label;
+  final TextEditingController controller;
+  final bool obscure;
+  CustomTextField({
+    super.key,
+    required this.label,
+    required this.controller,
+    this.obscure = false,
+  });
 
-  @override
-  State<FormField> createState() => _FormFieldState();
-}
-
-class _FormFieldState extends State<FormField> {
   final BorderRadius br = BorderRadius.circular(10);
+
   @override
   Widget build(BuildContext context) {
     double inputWidth = MediaQuery.of(context).size.width / 2.3;
@@ -30,6 +34,7 @@ class _FormFieldState extends State<FormField> {
         ],
       ),
       child: TextField(
+        controller: controller,
         style: GoogleFonts.zenKakuGothicAntique(
           textStyle: TextStyle(
             fontSize: 16,
@@ -37,8 +42,9 @@ class _FormFieldState extends State<FormField> {
             color: AppColors.primary,
           ),
         ),
-        obscureText: true,
+        obscureText: obscure,
         decoration: InputDecoration(
+          labelText: label,
           labelStyle: GoogleFonts.zenKakuGothicAntique(
             textStyle: TextStyle(
               fontSize: 15,
@@ -54,7 +60,6 @@ class _FormFieldState extends State<FormField> {
             ),
           ),
           border: OutlineInputBorder(),
-          labelText: widget.fieldName,
           contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 5),
           // The default border (when not focused)
           enabledBorder: OutlineInputBorder(
@@ -85,9 +90,43 @@ class _FormFieldState extends State<FormField> {
   }
 }
 
-class FormContainer extends StatelessWidget {
-  const FormContainer({super.key});
+class ProfileForm extends StatefulWidget {
+  const ProfileForm({super.key});
 
+  @override
+  State<ProfileForm> createState() => _ProfileFormState();
+}
+
+class _ProfileFormState extends State<ProfileForm> {
+  final firstNameCtrl = TextEditingController();
+  final lastNameCtrl = TextEditingController();
+  final emailCtrl = TextEditingController();
+  final newPassCtrl = TextEditingController();
+  final confirmPassCtrl = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    final user = Auth().currentUser;
+    // fetch your Firestore profile doc here, then:
+    // firstNameCtrl.text = fetchedFirstName;
+    // lastNameCtrl.text  = fetchedLastName;
+    emailCtrl.text = user?.email ?? '';
+  }
+
+  @override
+  void dispose() {
+    firstNameCtrl.dispose();
+    lastNameCtrl.dispose();
+    emailCtrl.dispose();
+    newPassCtrl.dispose();
+    confirmPassCtrl.dispose();
+    super.dispose();
+  }
+
+  Future<void> _updateProfile() async {
+    //   validate controller ans update details
+  }
   void doSomething() {}
 
   @override
@@ -98,10 +137,23 @@ class FormContainer extends StatelessWidget {
         spacing: 8,
         runSpacing: 8,
         children: [
-          FormField(fieldName: 'First Name'),
-          FormField(fieldName: 'Last Name'),
-          FormField(fieldName: 'Password'),
-          FormField(fieldName: 'Confirm Password'),
+          CustomTextField(label: 'First Name', controller: firstNameCtrl),
+          CustomTextField(label: 'Last Name', controller: lastNameCtrl),
+          CustomTextField(
+            label: 'email',
+            controller: emailCtrl,
+            obscure: false,
+          ),
+          CustomTextField(
+            label: 'New Password',
+            controller: newPassCtrl,
+            obscure: true,
+          ),
+          CustomTextField(
+            label: 'Confirm New Password',
+            controller: confirmPassCtrl,
+            obscure: true,
+          ),
           TextButton(
             onPressed: doSomething,
             style: TextButton.styleFrom(
