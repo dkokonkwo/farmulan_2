@@ -1,4 +1,4 @@
-import 'package:farmulan_2/utils/constants/icons.dart';
+import 'package:farmulan/utils/constants/icons.dart';
 import 'package:flutter/material.dart';
 
 import 'colors.dart';

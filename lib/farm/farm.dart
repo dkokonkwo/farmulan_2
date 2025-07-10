@@ -1,4 +1,4 @@
-import 'package:farmulan_2/farm/farm_containers.dart';
+import 'package:farmulan/farm/farm_containers.dart';
 import 'package:flutter/material.dart';
 
 class FarmPage extends StatefulWidget {

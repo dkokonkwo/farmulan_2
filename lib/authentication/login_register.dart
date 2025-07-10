@@ -1,7 +1,9 @@
-import 'package:farmulan_2/authentication/auth.dart';
-import 'package:farmulan_2/utils/constants/icons.dart';
+import 'package:farmulan/authentication/auth.dart';
+import 'package:farmulan/utils/constants/icons.dart';
+import 'package:farmulan/utils/constants/images.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lottie/lottie.dart';
 
@@ -42,89 +44,130 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
-    return Scaffold(
-      body: SingleChildScrollView(
-        child: Center(
-          child: Column(
-            children: [
-              SizedBox(height: screenHeight / 15),
-              Container(
-                width: screenWidth / 1.11,
-                height: screenWidth / 1.11,
-                child: Lottie.asset('assets/animations/login.json'),
-              ),
-              SizedBox(height: 20),
-              Text(
-                'Welcome back',
-                style: GoogleFonts.zenKakuGothicAntique(
-                  textStyle: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.pageBackground,
+    return Container(
+      decoration: BoxDecoration(
+        image: DecorationImage(
+          image: AssetImage(AppImages.background),
+          fit: BoxFit.cover,
+        ),
+      ),
+      child: Scaffold(
+        body: SingleChildScrollView(
+          child: Center(
+            child: Column(
+              children: [
+                SizedBox(height: screenHeight / 15),
+                Container(
+                  width: screenWidth / 1.11,
+                  height: screenWidth / 1.11,
+                  child: Lottie.asset('assets/animations/login.json'),
+                ),
+                SizedBox(height: 20),
+                Text(
+                  'Welcome back',
+                  style: GoogleFonts.zenKakuGothicAntique(
+                    textStyle: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.pageBackground,
+                    ),
                   ),
                 ),
-              ),
-              SizedBox(height: 5),
-              Text(
-                'Sign in to access your account',
-                style: GoogleFonts.zenKakuGothicAntique(
-                  textStyle: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.normal,
-                    color: AppColors.pageBackground.withValues(alpha: 0.5),
+                SizedBox(height: 5),
+                Text(
+                  'Sign in to access your account',
+                  style: GoogleFonts.zenKakuGothicAntique(
+                    textStyle: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.normal,
+                      color: AppColors.pageBackground.withValues(alpha: 0.5),
+                    ),
                   ),
                 ),
-              ),
-              SizedBox(height: 50),
-              AuthFormField(
-                fieldName: 'Enter your email',
-                icon: AppIcons.sms,
-                controller: emailController,
-                keyboardType: TextInputType.emailAddress,
-                autofillHints: [AutofillHints.email],
-              ),
-              SizedBox(height: 20),
-              AuthFormField(
-                fieldName: 'Password',
-                icon: AppIcons.eye,
-                toggleIcon: AppIcons.eyeSlash,
-                controller: passwordController,
-                keyboardType: TextInputType.visiblePassword,
-                autofillHints: [AutofillHints.password],
-              ),
-              SizedBox(height: screenHeight / 4),
-              ElevatedButton(
-                onPressed: _submit,
-                style: ElevatedButton.styleFrom(
-                  minimumSize: Size(screenWidth / 1.11, 50),
-                  padding: EdgeInsets.symmetric(vertical: 12),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
+                SizedBox(height: 50),
+                AuthFormField(
+                  fieldName: 'Enter your email',
+                  icon: AppIcons.sms,
+                  controller: emailController,
+                  keyboardType: TextInputType.emailAddress,
+                  autofillHints: [AutofillHints.email],
+                ),
+                SizedBox(height: 20),
+                AuthFormField(
+                  fieldName: 'Password',
+                  icon: AppIcons.eye,
+                  toggleIcon: AppIcons.eyeSlash,
+                  controller: passwordController,
+                  keyboardType: TextInputType.visiblePassword,
+                  autofillHints: [AutofillHints.password],
+                ),
+                SizedBox(height: screenHeight / 4),
+                ElevatedButton(
+                  onPressed: _submit,
+                  style: ElevatedButton.styleFrom(
+                    minimumSize: Size(screenWidth / 1.11, 50),
+                    padding: EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  child: Center(
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      spacing: 8,
+                      children: [
+                        Text(
+                          'Next',
+                          style: GoogleFonts.zenKakuGothicAntique(
+                            textStyle: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.pageBackground.withValues(
+                                alpha: 0.5,
+                              ),
+                            ),
+                          ),
+                        ),
+                        Icon(AppIcons.rightArrow, color: AppColors.primary),
+                      ],
+                    ),
                   ),
                 ),
-                child: Center(
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    spacing: 8,
-                    children: [
-                      Text(
-                        'Next',
+                SizedBox(height: 20),
+                Row(
+                  spacing: 5,
+                  children: [
+                    Text(
+                      'New member?',
+                      style: GoogleFonts.zenKakuGothicAntique(
+                        textStyle: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.normal,
+                          color: AppColors.pageBackground.withValues(
+                            alpha: 0.7,
+                          ),
+                        ),
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () => Get.to(SignUpPage()),
+                      child: Text(
+                        'Register now',
                         style: GoogleFonts.zenKakuGothicAntique(
                           textStyle: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.pageBackground.withValues(
-                              alpha: 0.5,
+                            fontSize: 15,
+                            fontWeight: FontWeight.normal,
+                            color: AppColors.contentColorRed.withValues(
+                              alpha: 0.8,
                             ),
                           ),
                         ),
                       ),
-                      Icon(AppIcons.rightArrow, color: AppColors.primary),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -192,135 +235,178 @@ class _SignUpPageState extends State<SignUpPage> {
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
-    return Scaffold(
-      body: SingleChildScrollView(
-        child: Center(
-          child: Column(
-            children: [
-              SizedBox(height: screenHeight / 15),
-              Container(
-                width: screenWidth / 1.11,
-                height: screenWidth / 1.11,
-                child: Lottie.asset('assets/animations/signup.json'),
-              ),
-              SizedBox(height: 20),
-              Text(
-                'Getting Started',
-                style: GoogleFonts.zenKakuGothicAntique(
-                  textStyle: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.pageBackground,
-                  ),
+    return Container(
+      decoration: BoxDecoration(
+        image: DecorationImage(
+          image: AssetImage(AppImages.background),
+          fit: BoxFit.cover,
+        ),
+      ),
+      child: Scaffold(
+        body: SingleChildScrollView(
+          child: Center(
+            child: Column(
+              children: [
+                SizedBox(height: screenHeight / 15),
+                Container(
+                  width: screenWidth / 1.11,
+                  height: screenWidth / 1.11,
+                  child: Lottie.asset('assets/animations/signup.json'),
                 ),
-              ),
-              SizedBox(height: 5),
-              Text(
-                'by creating your account',
-                style: GoogleFonts.zenKakuGothicAntique(
-                  textStyle: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.normal,
-                    color: AppColors.pageBackground.withValues(alpha: 0.5),
-                  ),
-                ),
-              ),
-              SizedBox(height: 30),
-              AuthFormField(
-                fieldName: 'First Name',
-                icon: AppIcons.personal,
-                controller: firstNameController,
-                keyboardType: TextInputType.text,
-              ),
-              SizedBox(height: 20),
-              AuthFormField(
-                fieldName: 'Last Name',
-                icon: AppIcons.personal,
-                controller: lastNameController,
-                keyboardType: TextInputType.text,
-              ),
-              SizedBox(height: 20),
-              AuthFormField(
-                fieldName: 'Valid email',
-                icon: AppIcons.sms,
-                controller: emailController,
-                keyboardType: TextInputType.emailAddress,
-              ),
-              SizedBox(height: 20),
-              AuthFormField(
-                fieldName: 'Password',
-                icon: AppIcons.eye,
-                toggleIcon: AppIcons.eyeSlash,
-                controller: passwordController,
-                keyboardType: TextInputType.visiblePassword,
-              ),
-              SizedBox(height: 20),
-              AuthFormField(
-                fieldName: 'Confirm Password',
-                icon: AppIcons.eye,
-                toggleIcon: AppIcons.eyeSlash,
-                controller: confirmPasswordController,
-                keyboardType: TextInputType.visiblePassword,
-              ),
-              SizedBox(height: 20),
-              Row(
-                spacing: 8,
-                children: [
-                  Checkbox(
-                    value: isChecked,
-                    activeColor: AppColors.pageBackground,
-                    checkColor: AppColors.primary,
-                    onChanged: (newBool) {
-                      setState(() {
-                        isChecked = newBool!;
-                      });
-                    },
-                  ),
-                  Text(
-                    'By checking the box you agree to our Terms and Conditions',
-                    style: GoogleFonts.zenKakuGothicAntique(
-                      textStyle: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.normal,
-                        color: AppColors.pageBackground.withValues(alpha: 0.5),
-                      ),
+                SizedBox(height: 20),
+                Text(
+                  'Getting Started',
+                  style: GoogleFonts.zenKakuGothicAntique(
+                    textStyle: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.pageBackground,
                     ),
                   ),
-                ],
-              ),
-              SizedBox(height: screenHeight / 5),
-              ElevatedButton(
-                onPressed: _submit,
-                style: ElevatedButton.styleFrom(
-                  minimumSize: Size(screenWidth / 1.11, 50),
-                  padding: EdgeInsets.symmetric(vertical: 12),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
+                ),
+                SizedBox(height: 5),
+                Text(
+                  'by creating your account',
+                  style: GoogleFonts.zenKakuGothicAntique(
+                    textStyle: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.normal,
+                      color: AppColors.pageBackground.withValues(alpha: 0.5),
+                    ),
                   ),
                 ),
-                child: Center(
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    spacing: 8,
-                    children: [
-                      Text(
-                        'Next',
+                SizedBox(height: 30),
+                AuthFormField(
+                  fieldName: 'First Name',
+                  icon: AppIcons.personal,
+                  controller: firstNameController,
+                  keyboardType: TextInputType.text,
+                ),
+                SizedBox(height: 20),
+                AuthFormField(
+                  fieldName: 'Last Name',
+                  icon: AppIcons.personal,
+                  controller: lastNameController,
+                  keyboardType: TextInputType.text,
+                ),
+                SizedBox(height: 20),
+                AuthFormField(
+                  fieldName: 'Valid email',
+                  icon: AppIcons.sms,
+                  controller: emailController,
+                  keyboardType: TextInputType.emailAddress,
+                ),
+                SizedBox(height: 20),
+                AuthFormField(
+                  fieldName: 'Password',
+                  icon: AppIcons.eye,
+                  toggleIcon: AppIcons.eyeSlash,
+                  controller: passwordController,
+                  keyboardType: TextInputType.visiblePassword,
+                ),
+                SizedBox(height: 20),
+                AuthFormField(
+                  fieldName: 'Confirm Password',
+                  icon: AppIcons.eye,
+                  toggleIcon: AppIcons.eyeSlash,
+                  controller: confirmPasswordController,
+                  keyboardType: TextInputType.visiblePassword,
+                ),
+                SizedBox(height: 20),
+                Row(
+                  spacing: 8,
+                  children: [
+                    Checkbox(
+                      value: isChecked,
+                      activeColor: AppColors.pageBackground,
+                      checkColor: AppColors.primary,
+                      onChanged: (newBool) {
+                        setState(() {
+                          isChecked = newBool!;
+                        });
+                      },
+                    ),
+                    Text(
+                      'By checking the box you agree to our Terms and Conditions',
+                      style: GoogleFonts.zenKakuGothicAntique(
+                        textStyle: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.normal,
+                          color: AppColors.pageBackground.withValues(
+                            alpha: 0.5,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: screenHeight / 5),
+                ElevatedButton(
+                  onPressed: _submit,
+                  style: ElevatedButton.styleFrom(
+                    minimumSize: Size(screenWidth / 1.11, 50),
+                    padding: EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  child: Center(
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      spacing: 8,
+                      children: [
+                        Text(
+                          'Next',
+                          style: GoogleFonts.zenKakuGothicAntique(
+                            textStyle: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.pageBackground.withValues(
+                                alpha: 0.5,
+                              ),
+                            ),
+                          ),
+                        ),
+                        Icon(AppIcons.rightArrow, color: AppColors.primary),
+                      ],
+                    ),
+                  ),
+                ),
+                SizedBox(height: 20),
+                Row(
+                  spacing: 5,
+                  children: [
+                    Text(
+                      'Already a member?',
+                      style: GoogleFonts.zenKakuGothicAntique(
+                        textStyle: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.normal,
+                          color: AppColors.pageBackground.withValues(
+                            alpha: 0.7,
+                          ),
+                        ),
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () => Get.to(LoginPage()),
+                      child: Text(
+                        'Login',
                         style: GoogleFonts.zenKakuGothicAntique(
                           textStyle: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
+                            fontSize: 15,
+                            fontWeight: FontWeight.normal,
                             color: AppColors.pageBackground.withValues(
-                              alpha: 0.5,
+                              alpha: 0.8,
                             ),
                           ),
                         ),
                       ),
-                      Icon(AppIcons.rightArrow, color: AppColors.primary),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

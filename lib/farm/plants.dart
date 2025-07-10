@@ -1,11 +1,11 @@
 import 'dart:ui';
 
-import 'package:farmulan_2/farm/plant_data.dart';
-import 'package:farmulan_2/farm/plant_details.dart';
-import 'package:farmulan_2/farm/plant_item.dart';
-import 'package:farmulan_2/utils/constants/colors.dart';
-import 'package:farmulan_2/utils/constants/icons.dart';
-import 'package:farmulan_2/utils/constants/images.dart';
+import 'package:farmulan/farm/plant_data.dart';
+import 'package:farmulan/farm/plant_details.dart';
+import 'package:farmulan/farm/plant_item.dart';
+import 'package:farmulan/utils/constants/colors.dart';
+import 'package:farmulan/utils/constants/icons.dart';
+import 'package:farmulan/utils/constants/images.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';

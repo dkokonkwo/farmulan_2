@@ -1,8 +1,8 @@
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:farmulan_2/farm/updated_bar_chart.dart';
-import 'package:farmulan_2/home/home_banner.dart';
-import 'package:farmulan_2/utils/constants/colors.dart';
-import 'package:farmulan_2/utils/constants/sensor_chart.dart';
+import 'package:farmulan/farm/updated_bar_chart.dart';
+import 'package:farmulan/home/home_banner.dart';
+import 'package:farmulan/utils/constants/colors.dart';
+import 'package:farmulan/utils/constants/sensor_chart.dart';
 import 'package:flutter/material.dart';
 
 class HomeCarousel extends StatefulWidget {

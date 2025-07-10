@@ -1,6 +1,6 @@
 {
-    "name": "farmulan_2",
-    "short_name": "farmulan_2",
+    "name": "farmulan",
+    "short_name": "farmulan",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

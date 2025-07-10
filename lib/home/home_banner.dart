@@ -1,5 +1,5 @@
-import 'package:farmulan_2/utils/constants/icons.dart';
-import 'package:farmulan_2/utils/constants/images.dart';
+import 'package:farmulan/utils/constants/icons.dart';
+import 'package:farmulan/utils/constants/images.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 

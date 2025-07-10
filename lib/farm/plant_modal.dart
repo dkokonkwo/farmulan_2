@@ -1,7 +1,7 @@
-import 'package:farmulan_2/farm/modal_tab.dart';
-import 'package:farmulan_2/farm/plant_container.dart';
-import 'package:farmulan_2/utils/constants/glass_box.dart';
-import 'package:farmulan_2/utils/constants/icons.dart';
+import 'package:farmulan/farm/modal_tab.dart';
+import 'package:farmulan/farm/plant_container.dart';
+import 'package:farmulan/utils/constants/glass_box.dart';
+import 'package:farmulan/utils/constants/icons.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 

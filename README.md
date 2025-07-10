@@ -2,7 +2,7 @@
 
 ## LINK TO DEMO VIDEO: https://drive.google.com/file/d/17dsf9IUm-cG2yG_PU2prHnpHq_Y7OTsa/view?usp=sharing
 
-## LINK TO GITHUB REPOSITORY: https://github.com/dkokonkwo/farmulan_2.git
+## LINK TO GITHUB REPOSITORY: https://github.com/dkokonkwo/farmulan.git
 
 ## Project Overview
 
@@ -31,8 +31,8 @@ Follow these steps to get your project up and running:
 1.  **Clone the repository:**
 
     ```bash
-    git clone [https://github.com/your-username/farmulan_2.git](https://github.com/dkokonkwo/farmulan_2.git)
-    cd farmulan_2
+    git clone [https://github.com/your-username/farmulan.git](https://github.com/dkokonkwo/farmulan.git)
+    cd farmulan
     ```
 
 2.  **Install Dependencies:**

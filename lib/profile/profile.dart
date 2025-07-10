@@ -1,4 +1,4 @@
-import 'package:farmulan_2/profile/expansion_tiles.dart';
+import 'package:farmulan/profile/expansion_tiles.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lottie/lottie.dart';

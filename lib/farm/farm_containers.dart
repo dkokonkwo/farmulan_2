@@ -1,8 +1,8 @@
 import 'dart:ui';
 
-import 'package:farmulan_2/farm/farm_tabs.dart';
-import 'package:farmulan_2/farm/plants.dart';
-import 'package:farmulan_2/utils/constants/images.dart';
+import 'package:farmulan/farm/farm_tabs.dart';
+import 'package:farmulan/farm/plants.dart';
+import 'package:farmulan/utils/constants/images.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 

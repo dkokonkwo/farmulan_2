@@ -1,9 +1,9 @@
-import 'package:farmulan_2/farm/farm.dart';
-import 'package:farmulan_2/home/home.dart';
-import 'package:farmulan_2/profile/profile.dart';
-import 'package:farmulan_2/utils/constants/MyAppBar.dart';
-import 'package:farmulan_2/utils/constants/colors.dart';
-import 'package:farmulan_2/utils/constants/custom_navbar.dart';
+import 'package:farmulan/farm/farm.dart';
+import 'package:farmulan/home/home.dart';
+import 'package:farmulan/profile/profile.dart';
+import 'package:farmulan/utils/constants/MyAppBar.dart';
+import 'package:farmulan/utils/constants/colors.dart';
+import 'package:farmulan/utils/constants/custom_navbar.dart';
 import 'package:flutter/material.dart';
 
 class MyNavBar extends StatefulWidget {

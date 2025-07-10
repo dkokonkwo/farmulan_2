@@ -1,8 +1,8 @@
-import 'package:farmulan_2/farm/farm.dart';
-import 'package:farmulan_2/profile/profile.dart';
-import 'package:farmulan_2/utils/constants/colors.dart';
-import 'package:farmulan_2/utils/constants/icons.dart';
-import 'package:farmulan_2/utils/constants/navigation.dart';
+import 'package:farmulan/farm/farm.dart';
+import 'package:farmulan/profile/profile.dart';
+import 'package:farmulan/utils/constants/colors.dart';
+import 'package:farmulan/utils/constants/icons.dart';
+import 'package:farmulan/utils/constants/navigation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';

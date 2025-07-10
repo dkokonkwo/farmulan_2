@@ -1,7 +1,7 @@
 import 'dart:ui';
 
-import 'package:farmulan_2/utils/constants/colors.dart';
-import 'package:farmulan_2/utils/constants/images.dart';
+import 'package:farmulan/utils/constants/colors.dart';
+import 'package:farmulan/utils/constants/images.dart';
 import 'package:flutter/material.dart';
 
 class GlassBox extends StatelessWidget {

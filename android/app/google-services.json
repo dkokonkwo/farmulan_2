@@ -8,9 +8,9 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:619941529338:android:690b203f9d18b5c4b02b43",
+        "mobilesdk_app_id": "1:619941529338:android:96797931246dcdffb02b43",
         "android_client_info": {
-          "package_name": "com.example.farmulan_2"
+          "package_name": "com.example.farmulan"
         }
       },
       "oauth_client": [],

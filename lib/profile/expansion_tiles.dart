@@ -1,9 +1,9 @@
-import 'package:farmulan_2/authentication/auth.dart';
-import 'package:farmulan_2/profile/feedback.dart';
-import 'package:farmulan_2/profile/location.dart';
-import 'package:farmulan_2/profile/personal_form.dart';
-import 'package:farmulan_2/utils/constants/colors.dart';
-import 'package:farmulan_2/utils/constants/icons.dart';
+import 'package:farmulan/authentication/auth.dart';
+import 'package:farmulan/profile/feedback.dart';
+import 'package:farmulan/profile/location.dart';
+import 'package:farmulan/profile/personal_form.dart';
+import 'package:farmulan/utils/constants/colors.dart';
+import 'package:farmulan/utils/constants/icons.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -37,7 +37,7 @@ class _ProfileExpansionTilesState extends State<ProfileExpansionTiles> {
   ];
 
   final List<Widget> tileBodyList = [
-    FormContainer(),
+    ProfileForm(),
     LocationPicker(),
     FeedbackForm(),
   ];

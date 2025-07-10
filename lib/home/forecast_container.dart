@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:farmulan_2/home/weather_property.dart';
+import 'package:farmulan/home/weather_property.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_fonts/google_fonts.dart';

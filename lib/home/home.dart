@@ -1,8 +1,8 @@
-import 'package:farmulan_2/home/forecast_container.dart';
-import 'package:farmulan_2/home/home_carousel.dart';
-import 'package:farmulan_2/home/sensor_item.dart';
-import 'package:farmulan_2/utils/constants/glass_container.dart';
-import 'package:farmulan_2/utils/constants/icons.dart';
+import 'package:farmulan/home/forecast_container.dart';
+import 'package:farmulan/home/home_carousel.dart';
+import 'package:farmulan/home/sensor_item.dart';
+import 'package:farmulan/utils/constants/glass_container.dart';
+import 'package:farmulan/utils/constants/icons.dart';
 import 'package:flutter/material.dart';
 
 class HomePage extends StatefulWidget {

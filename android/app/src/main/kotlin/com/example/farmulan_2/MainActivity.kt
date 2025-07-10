@@ -1,4 +1,4 @@
-package com.example.farmulan_2
+package com.example.farmulan
 
 import io.flutter.embedding.android.FlutterActivity
 

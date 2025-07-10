@@ -1,8 +1,8 @@
-import 'package:farmulan_2/farm/bottom_buttons.dart';
-import 'package:farmulan_2/farm/plant_data.dart';
-import 'package:farmulan_2/farm/sensor_tabs.dart';
-import 'package:farmulan_2/farm/toggle_chart.dart';
-import 'package:farmulan_2/utils/constants/colors.dart';
+import 'package:farmulan/farm/bottom_buttons.dart';
+import 'package:farmulan/farm/plant_data.dart';
+import 'package:farmulan/farm/sensor_tabs.dart';
+import 'package:farmulan/farm/toggle_chart.dart';
+import 'package:farmulan/utils/constants/colors.dart';
 import 'package:flutter/material.dart';
 
 import '../utils/constants/plant_details_appbar.dart';

@@ -1,6 +1,6 @@
-import 'package:farmulan_2/farm/chart_dropdown.dart';
-import 'package:farmulan_2/farm/plant_data.dart';
-import 'package:farmulan_2/utils/constants/bar_chart.dart';
+import 'package:farmulan/farm/chart_dropdown.dart';
+import 'package:farmulan/farm/plant_data.dart';
+import 'package:farmulan/utils/constants/bar_chart.dart';
 import 'package:flutter/material.dart' hide BoxDecoration, BoxShadow;
 import 'package:flutter_inset_box_shadow/flutter_inset_box_shadow.dart';
 import 'package:google_fonts/google_fonts.dart';

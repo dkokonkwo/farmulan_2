@@ -1,5 +1,5 @@
-import 'package:farmulan_2/authentication/auth.dart';
-import 'package:farmulan_2/utils/constants/colors.dart';
+import 'package:farmulan/authentication/auth.dart';
+import 'package:farmulan/utils/constants/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -127,7 +127,6 @@ class _ProfileFormState extends State<ProfileForm> {
   Future<void> _updateProfile() async {
     //   validate controller ans update details
   }
-  void doSomething() {}
 
   @override
   Widget build(BuildContext context) {
@@ -155,7 +154,7 @@ class _ProfileFormState extends State<ProfileForm> {
             obscure: true,
           ),
           TextButton(
-            onPressed: doSomething,
+            onPressed: _updateProfile,
             style: TextButton.styleFrom(
               backgroundColor: AppColors.primary,
               padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
