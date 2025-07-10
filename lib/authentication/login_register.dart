@@ -52,35 +52,34 @@ class _LoginPageState extends State<LoginPage> {
         ),
       ),
       child: Scaffold(
+        backgroundColor: Colors.transparent,
         body: SingleChildScrollView(
           child: Center(
             child: Column(
               children: [
-                SizedBox(height: screenHeight / 15),
+                SizedBox(height: screenHeight / 20),
                 Container(
-                  width: screenWidth / 1.11,
-                  height: screenWidth / 1.11,
+                  width: screenWidth / 1.3,
+                  height: screenWidth / 1.3,
                   child: Lottie.asset('assets/animations/login.json'),
                 ),
-                SizedBox(height: 20),
                 Text(
                   'Welcome back',
                   style: GoogleFonts.zenKakuGothicAntique(
                     textStyle: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
+                      fontSize: 35,
+                      fontWeight: FontWeight.w800,
                       color: AppColors.pageBackground,
                     ),
                   ),
                 ),
-                SizedBox(height: 5),
                 Text(
                   'Sign in to access your account',
                   style: GoogleFonts.zenKakuGothicAntique(
                     textStyle: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.normal,
-                      color: AppColors.pageBackground.withValues(alpha: 0.5),
+                      color: AppColors.pageBackground.withValues(alpha: 0.7),
                     ),
                   ),
                 ),
@@ -92,7 +91,7 @@ class _LoginPageState extends State<LoginPage> {
                   keyboardType: TextInputType.emailAddress,
                   autofillHints: [AutofillHints.email],
                 ),
-                SizedBox(height: 20),
+                SizedBox(height: 15),
                 AuthFormField(
                   fieldName: 'Password',
                   icon: AppIcons.eye,
@@ -101,11 +100,11 @@ class _LoginPageState extends State<LoginPage> {
                   keyboardType: TextInputType.visiblePassword,
                   autofillHints: [AutofillHints.password],
                 ),
-                SizedBox(height: screenHeight / 4),
+                SizedBox(height: screenHeight / 5.5),
                 ElevatedButton(
                   onPressed: _submit,
                   style: ElevatedButton.styleFrom(
-                    minimumSize: Size(screenWidth / 1.11, 50),
+                    fixedSize: Size(screenWidth / 1.11, 57),
                     padding: EdgeInsets.symmetric(vertical: 12),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
@@ -122,9 +121,7 @@ class _LoginPageState extends State<LoginPage> {
                             textStyle: TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
-                              color: AppColors.pageBackground.withValues(
-                                alpha: 0.5,
-                              ),
+                              color: AppColors.primary,
                             ),
                           ),
                         ),
@@ -136,6 +133,7 @@ class _LoginPageState extends State<LoginPage> {
                 SizedBox(height: 20),
                 Row(
                   spacing: 5,
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
                       'New member?',
@@ -155,11 +153,15 @@ class _LoginPageState extends State<LoginPage> {
                         'Register now',
                         style: GoogleFonts.zenKakuGothicAntique(
                           textStyle: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.normal,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
                             color: AppColors.contentColorRed.withValues(
                               alpha: 0.8,
                             ),
+                            decoration: TextDecoration.underline,
+                            decorationColor: AppColors.contentColorRed
+                                .withValues(alpha: 0.8), // underline color
+                            decorationThickness: 2.0, // line thickness
                           ),
                         ),
                       ),
@@ -243,28 +245,27 @@ class _SignUpPageState extends State<SignUpPage> {
         ),
       ),
       child: Scaffold(
+        backgroundColor: Colors.transparent,
         body: SingleChildScrollView(
           child: Center(
             child: Column(
               children: [
-                SizedBox(height: screenHeight / 15),
+                SizedBox(height: screenHeight / 35),
                 Container(
-                  width: screenWidth / 1.11,
-                  height: screenWidth / 1.11,
-                  child: Lottie.asset('assets/animations/signup.json'),
+                  width: screenWidth / 1.8,
+                  height: screenWidth / 1.8,
+                  child: Lottie.asset('assets/animations/updatedWindmill.json'),
                 ),
-                SizedBox(height: 20),
                 Text(
                   'Getting Started',
                   style: GoogleFonts.zenKakuGothicAntique(
                     textStyle: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
+                      fontSize: 35,
+                      fontWeight: FontWeight.w800,
                       color: AppColors.pageBackground,
                     ),
                   ),
                 ),
-                SizedBox(height: 5),
                 Text(
                   'by creating your account',
                   style: GoogleFonts.zenKakuGothicAntique(
@@ -282,21 +283,21 @@ class _SignUpPageState extends State<SignUpPage> {
                   controller: firstNameController,
                   keyboardType: TextInputType.text,
                 ),
-                SizedBox(height: 20),
+                SizedBox(height: 10),
                 AuthFormField(
                   fieldName: 'Last Name',
                   icon: AppIcons.personal,
                   controller: lastNameController,
                   keyboardType: TextInputType.text,
                 ),
-                SizedBox(height: 20),
+                SizedBox(height: 10),
                 AuthFormField(
                   fieldName: 'Valid email',
                   icon: AppIcons.sms,
                   controller: emailController,
                   keyboardType: TextInputType.emailAddress,
                 ),
-                SizedBox(height: 20),
+                SizedBox(height: 10),
                 AuthFormField(
                   fieldName: 'Password',
                   icon: AppIcons.eye,
@@ -304,7 +305,7 @@ class _SignUpPageState extends State<SignUpPage> {
                   controller: passwordController,
                   keyboardType: TextInputType.visiblePassword,
                 ),
-                SizedBox(height: 20),
+                SizedBox(height: 10),
                 AuthFormField(
                   fieldName: 'Confirm Password',
                   icon: AppIcons.eye,
@@ -312,7 +313,7 @@ class _SignUpPageState extends State<SignUpPage> {
                   controller: confirmPasswordController,
                   keyboardType: TextInputType.visiblePassword,
                 ),
-                SizedBox(height: 20),
+                SizedBox(height: 10),
                 Row(
                   spacing: 8,
                   children: [
@@ -320,6 +321,10 @@ class _SignUpPageState extends State<SignUpPage> {
                       value: isChecked,
                       activeColor: AppColors.pageBackground,
                       checkColor: AppColors.primary,
+                      side: BorderSide(
+                        color: AppColors.pageBackground,
+                        width: 2,
+                      ),
                       onChanged: (newBool) {
                         setState(() {
                           isChecked = newBool!;
@@ -332,19 +337,17 @@ class _SignUpPageState extends State<SignUpPage> {
                         textStyle: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.normal,
-                          color: AppColors.pageBackground.withValues(
-                            alpha: 0.5,
-                          ),
+                          color: AppColors.pageBackground,
                         ),
                       ),
                     ),
                   ],
                 ),
-                SizedBox(height: screenHeight / 5),
+                SizedBox(height: screenHeight / 15),
                 ElevatedButton(
                   onPressed: _submit,
                   style: ElevatedButton.styleFrom(
-                    minimumSize: Size(screenWidth / 1.11, 50),
+                    fixedSize: Size(screenWidth / 1.11, 57),
                     padding: EdgeInsets.symmetric(vertical: 12),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
@@ -361,9 +364,7 @@ class _SignUpPageState extends State<SignUpPage> {
                             textStyle: TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
-                              color: AppColors.pageBackground.withValues(
-                                alpha: 0.5,
-                              ),
+                              color: AppColors.primary,
                             ),
                           ),
                         ),
@@ -375,6 +376,7 @@ class _SignUpPageState extends State<SignUpPage> {
                 SizedBox(height: 20),
                 Row(
                   spacing: 5,
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
                       'Already a member?',
@@ -394,11 +396,15 @@ class _SignUpPageState extends State<SignUpPage> {
                         'Login',
                         style: GoogleFonts.zenKakuGothicAntique(
                           textStyle: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.normal,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
                             color: AppColors.pageBackground.withValues(
                               alpha: 0.8,
                             ),
+                            decoration: TextDecoration.underline,
+                            decorationColor: AppColors.pageBackground
+                                .withValues(alpha: 0.8), // underline color
+                            decorationThickness: 2.0,
                           ),
                         ),
                       ),
@@ -480,19 +486,19 @@ class _AuthFormFieldState extends State<AuthFormField> {
             textStyle: TextStyle(
               fontSize: 15,
               fontWeight: FontWeight.normal,
-              color: AppColors.regularText.withValues(alpha: 0.8),
+              color: AppColors.pageBackground.withValues(alpha: 0.8),
             ),
           ),
           hintStyle: GoogleFonts.zenKakuGothicAntique(
             textStyle: TextStyle(
               fontSize: 15,
               fontWeight: FontWeight.normal,
-              color: AppColors.regularText.withValues(alpha: 0.8),
+              color: AppColors.pageBackground.withValues(alpha: 0.8),
             ),
           ),
           border: OutlineInputBorder(),
           labelText: widget.fieldName,
-          contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 5),
+          contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
           // The default border (when not focused)
           enabledBorder: OutlineInputBorder(
             borderRadius: br, // corner radius
