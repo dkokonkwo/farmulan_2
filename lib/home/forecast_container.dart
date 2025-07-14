@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:farmulan/authentication/auth.dart';
 import 'package:farmulan/home/weather_property.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
@@ -12,6 +14,7 @@ import 'package:toastification/toastification.dart';
 import '../utils/constants/colors.dart';
 import '../utils/constants/icons.dart';
 import '../utils/constants/plant_details_appbar.dart';
+import '../utils/constants/toasts.dart';
 
 class WeatherInfo extends StatefulWidget {
   const WeatherInfo({super.key});
@@ -49,6 +52,7 @@ class _WeatherAPIDataState extends State<WeatherAPIData> {
   double temp = 0.0;
   String icon = '';
   String description = '';
+
   @override
   void initState() {
     super.initState();
@@ -269,10 +273,16 @@ class _GPSLocatorState extends State<GPSLocator> {
       }
     }
 
-    _getLocation().whenComplete(popDialog);
+    _getLocationAndStore().whenComplete(popDialog);
   }
 
-  Future<void> _getLocation() async {
+  Future<void> _getLocationAndStore() async {
+    final user = Auth().currentUser;
+    if (user == null) {
+      showErrorToast(context, 'User not signed in');
+      return;
+    }
+
     if (!await Geolocator.isLocationServiceEnabled()) {
       if (!mounted) return;
       showToast(context, 'Location services are disabled.');
@@ -292,9 +302,10 @@ class _GPSLocatorState extends State<GPSLocator> {
       return;
     }
 
-    // fetch the position and store
+    // fetch the position and store in hive
+    Position pos;
     try {
-      final pos = await Geolocator.getCurrentPosition(
+      pos = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,
       );
       await _myBox.put('location', [pos.latitude, pos.longitude]);
@@ -302,6 +313,29 @@ class _GPSLocatorState extends State<GPSLocator> {
     } catch (e) {
       if (!mounted) return;
       showToast(context, e);
+      return;
+    }
+
+    // Create a new farm document with auto-ID, then set its data
+    try {
+      final farmRef = FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .collection('farms')
+          .doc('');
+
+      final farmId = farmRef.id;
+      await farmRef.set({
+        'coord': GeoPoint(pos.latitude, pos.longitude),
+        'createdAt': Timestamp.now(),
+      });
+
+      await _myBox.put('farmId', farmId);
+      if (!mounted) return;
+      showSuccessToast(context, 'Farm created with ID $farmId');
+    } catch (e) {
+      if (!mounted) return;
+      showErrorToast(context, 'Failed to create farm: $e');
     }
   }
 

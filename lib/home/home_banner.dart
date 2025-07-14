@@ -2,11 +2,40 @@ import 'package:farmulan/utils/constants/icons.dart';
 import 'package:farmulan/utils/constants/images.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hive/hive.dart';
 
 import '../utils/constants/colors.dart';
 
-class HomeBanner extends StatelessWidget {
+class HomeBanner extends StatefulWidget {
   const HomeBanner({super.key});
+
+  @override
+  State<HomeBanner> createState() => _HomeBannerState();
+}
+
+class _HomeBannerState extends State<HomeBanner> {
+  String _farmId = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _getFarmId();
+  }
+
+  Future<void> _getFarmId() async {
+    final box = Hive.box('farmulanDB');
+    final stored = box.get('farmId');
+    if (stored is String && stored.isNotEmpty) {
+      setState(() {
+        _farmId = stored;
+      });
+    } else {
+      // Optional: show a placeholder or prompt the user to create a farm
+      setState(() {
+        _farmId = '______';
+      });
+    }
+  }
 
   void doSomething() {}
 
@@ -66,7 +95,7 @@ class HomeBanner extends StatelessWidget {
                       ),
 
                       Text(
-                        "ID: 1344295024",
+                        "ID: $_farmId",
                         style: GoogleFonts.zenKakuGothicAntique(
                           textStyle: const TextStyle(
                             fontSize: 15,
