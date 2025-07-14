@@ -1,4 +1,5 @@
 import 'package:farmulan/authentication/auth.dart';
+import 'package:farmulan/authentication/welcome_onboarding.dart';
 import 'package:farmulan/profile/feedback.dart';
 import 'package:farmulan/profile/location.dart';
 import 'package:farmulan/profile/personal_form.dart';
@@ -6,6 +7,7 @@ import 'package:farmulan/utils/constants/colors.dart';
 import 'package:farmulan/utils/constants/icons.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class ProfileExpansionTiles extends StatefulWidget {
@@ -17,10 +19,6 @@ class ProfileExpansionTiles extends StatefulWidget {
 
 class _ProfileExpansionTilesState extends State<ProfileExpansionTiles> {
   final User? user = Auth().currentUser;
-
-  Future<void> signOut() async {
-    await Auth().signOut();
-  }
 
   final List<String> profileTitles = ['Personal', 'Farm', 'Feedback', 'Logout'];
   final List<String> profileSubheadings = [
@@ -42,12 +40,19 @@ class _ProfileExpansionTilesState extends State<ProfileExpansionTiles> {
     FeedbackForm(),
   ];
 
+  Future<void> signOutAndGoHome() async {
+    await Auth().signOut();
+    Get.offAll(() => WelcomePage());
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
       spacing: 8.0,
-      children: List.generate(4, (index) {
+      children: List.generate(profileTitles.length, (index) {
+        final isLogout = index == profileTitles.length - 1;
         return ExpansionTile(
+          leading: ExpansionLeadingIcon(icon: profileIcons[index]),
           title: Text(
             profileTitles[index],
             style: GoogleFonts.zenKakuGothicAntique(
@@ -69,11 +74,12 @@ class _ProfileExpansionTilesState extends State<ProfileExpansionTiles> {
               ),
             ),
           ),
-          showTrailingIcon: index != 3,
-          leading: ExpansionLeadingIcon(icon: profileIcons[index]),
-          children: [?index != 3 ? tileBodyList[index] : null],
+          showTrailingIcon: !isLogout,
+          children: isLogout ? const [] : [tileBodyList[index]],
           onExpansionChanged: (bool expanded) {
-            index == 3 && expanded ? signOut : null;
+            if (isLogout && expanded) {
+              signOutAndGoHome();
+            }
           },
         );
       }),

@@ -274,6 +274,7 @@ class _GPSLocatorState extends State<GPSLocator> {
 
   Future<void> _getLocation() async {
     if (!await Geolocator.isLocationServiceEnabled()) {
+      if (!mounted) return;
       showToast(context, 'Location services are disabled.');
       return;
     }
@@ -286,6 +287,7 @@ class _GPSLocatorState extends State<GPSLocator> {
 
     if (permission != LocationPermission.always &&
         permission != LocationPermission.whileInUse) {
+      if (!mounted) return;
       showToast(context, 'Location permission denied.');
       return;
     }
@@ -298,6 +300,7 @@ class _GPSLocatorState extends State<GPSLocator> {
       await _myBox.put('location', [pos.latitude, pos.longitude]);
       setState(() {});
     } catch (e) {
+      if (!mounted) return;
       showToast(context, e);
     }
   }

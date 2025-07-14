@@ -4,9 +4,13 @@ import 'package:flutter_inset_box_shadow/flutter_inset_box_shadow.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class CustomFarmTab extends StatefulWidget {
-  bool isSelected;
+  final bool isSelected;
   final String title;
-  CustomFarmTab({super.key, required this.isSelected, required this.title});
+  const CustomFarmTab({
+    super.key,
+    required this.isSelected,
+    required this.title,
+  });
 
   @override
   State<CustomFarmTab> createState() => _CustomFarmTabState();

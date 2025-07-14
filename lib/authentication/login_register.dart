@@ -1,6 +1,8 @@
 import 'package:farmulan/authentication/auth.dart';
 import 'package:farmulan/utils/constants/icons.dart';
 import 'package:farmulan/utils/constants/images.dart';
+import 'package:farmulan/utils/constants/navigation.dart';
+import 'package:farmulan/utils/constants/toasts.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -26,10 +28,10 @@ class _LoginPageState extends State<LoginPage> {
         email: emailController.text.trim(),
         password: passwordController.text,
       );
+      Get.offAll(() => MyNavBar());
     } on FirebaseAuthException catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(e.message ?? 'Login failed')));
+      if (!mounted) return;
+      showErrorToast(context, 'Login failed: ${e.message}');
     }
   }
 
@@ -58,7 +60,7 @@ class _LoginPageState extends State<LoginPage> {
             child: Column(
               children: [
                 SizedBox(height: screenHeight / 20),
-                Container(
+                SizedBox(
                   width: screenWidth / 1.3,
                   height: screenWidth / 1.3,
                   child: Lottie.asset('assets/animations/login.json'),
@@ -194,12 +196,9 @@ class _SignUpPageState extends State<SignUpPage> {
 
   Future<void> _submit() async {
     if (!isChecked) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'Please agree to our terms and conditions before signing up',
-          ),
-        ),
+      showInfoToast(
+        context,
+        'Please tick the checkbox to agree to the terms and conditions',
       );
       return;
     }
@@ -207,19 +206,59 @@ class _SignUpPageState extends State<SignUpPage> {
     if (passwordController.text != confirmPasswordController.text) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text('Password does not match')));
+      ).showSnackBar(const SnackBar(content: Text('Password does not match')));
       return;
     }
+
+    // show the loading dialog
+    showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: AppColors.pageBackground,
+        content: Column(
+          spacing: 10.0,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Lottie.asset('assets/animations/IoTloading.json'),
+            Text(
+              'Registering...',
+              textAlign: TextAlign.center,
+              style: GoogleFonts.zenKakuGothicAntique(
+                textStyle: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w900,
+                  color: AppColors.primaryRed,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
 
     try {
       await Auth().createUserWithEmailAndPassword(
         email: emailController.text.trim(),
         password: passwordController.text,
+        firstName: firstNameController.text.trim(),
+        lastName: lastNameController.text.trim(),
       );
+
+      if (!mounted) return;
+      showSuccessToast(context, 'Registration successful');
+      Get.offAll(() => MyNavBar());
     } on FirebaseAuthException catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.message ?? 'Registration failed')),
-      );
+      if (!mounted) return;
+      showErrorToast(context, 'Registration failed: ${e.message}');
+    } catch (e) {
+      if (!mounted) return;
+      showErrorToast(context, 'An unexpected error occurred: $e');
+    } finally {
+      // always dismiss the loading dialog
+      if (mounted) {
+        Navigator.of(context, rootNavigator: true).pop();
+      }
     }
   }
 
@@ -251,7 +290,7 @@ class _SignUpPageState extends State<SignUpPage> {
             child: Column(
               children: [
                 SizedBox(height: screenHeight / 35),
-                Container(
+                SizedBox(
                   width: screenWidth / 1.8,
                   height: screenWidth / 1.8,
                   child: Lottie.asset('assets/animations/updatedWindmill.json'),

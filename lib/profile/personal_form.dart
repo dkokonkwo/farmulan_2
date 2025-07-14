@@ -1,5 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:farmulan/authentication/auth.dart';
 import 'package:farmulan/utils/constants/colors.dart';
+import 'package:farmulan/utils/constants/toasts.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -103,6 +106,7 @@ class _ProfileFormState extends State<ProfileForm> {
   final emailCtrl = TextEditingController();
   final newPassCtrl = TextEditingController();
   final confirmPassCtrl = TextEditingController();
+  bool isUpdating = false;
 
   @override
   void initState() {
@@ -112,6 +116,7 @@ class _ProfileFormState extends State<ProfileForm> {
     // firstNameCtrl.text = fetchedFirstName;
     // lastNameCtrl.text  = fetchedLastName;
     emailCtrl.text = user?.email ?? '';
+    _loadUserProfile();
   }
 
   @override
@@ -124,8 +129,131 @@ class _ProfileFormState extends State<ProfileForm> {
     super.dispose();
   }
 
+  Future<void> _loadUserProfile() async {
+    final user = Auth().currentUser;
+    if (user == null) return;
+
+    try {
+      final doc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .get();
+
+      if (doc.exists) {
+        final data = doc.data()!;
+        firstNameCtrl.text = data['firstName'] as String? ?? '';
+        lastNameCtrl.text = data['lastName'] as String? ?? '';
+      }
+    } catch (e) {
+      if (!mounted) return;
+      showErrorToast(context, 'Error loading profile: $e');
+    }
+  }
+
+  Future<bool> _reauthenticate(String currentPassword) async {
+    try {
+      final user = Auth().currentUser;
+      if (user == null || user.email == null) return false;
+
+      // 1. Create a credential using their email + current password
+      final cred = EmailAuthProvider.credential(
+        email: user.email!,
+        password: currentPassword,
+      );
+
+      // 2. Ask Firebase to reauthenticate
+      await user.reauthenticateWithCredential(cred);
+      return true;
+    } on FirebaseAuthException catch (e) {
+      showErrorToast(context, 'Re-authentication failed: ${e.message}');
+      return false;
+    }
+  }
+
   Future<void> _updateProfile() async {
-    //   validate controller ans update details
+    setState(() => isUpdating = true);
+
+    final user = Auth().currentUser;
+    if (user == null) {
+      showErrorToast(context, 'User not signed in');
+      setState(() => isUpdating = false);
+      return;
+    }
+
+    // If they entered a new password, reauthenticate then update
+    if (newPassCtrl.text.isNotEmpty) {
+      // First ask them for their **current** password
+      final currentPassCtrl = TextEditingController();
+      final confirmed = await showDialog<String>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text('Confirm your password'),
+          content: TextField(
+            controller: currentPassCtrl,
+            autofocus: true,
+            obscureText: true,
+            decoration: const InputDecoration(labelText: 'Current password'),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(context, currentPassCtrl.text),
+              child: const Text('OK'),
+            ),
+          ],
+        ),
+      );
+      currentPassCtrl.dispose();
+
+      if (confirmed == null || confirmed.isEmpty) {
+        showErrorToast(context, 'Password confirmation is required');
+        setState(() => isUpdating = false);
+        return;
+      }
+
+      // Re authenticate
+      final ok = await _reauthenticate(confirmed);
+      if (!ok) {
+        setState(() => isUpdating = false);
+        return;
+      }
+
+      // Now safe to update the password
+      try {
+        await user.updatePassword(newPassCtrl.text);
+      } on FirebaseAuthException catch (e) {
+        if (!mounted) return;
+        showErrorToast(context, 'Password update failed: ${e.message}');
+        setState(() => isUpdating = false);
+        return;
+      }
+    }
+
+    // merge first and last name to firestore
+    try {
+      await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
+        'firstName': firstNameCtrl.text.trim(),
+        'lastName': lastNameCtrl.text.trim(),
+      }, SetOptions(merge: true));
+
+      await user.reload();
+      if (!mounted) return;
+      showSuccessToast(context, 'Profile updated');
+    } catch (e) {
+      if (!mounted) return;
+      showErrorToast(context, 'Failed to update profile: $e');
+    } finally {
+      setState(() {
+        isUpdating = false;
+      });
+    }
+
+    setState(() {
+      isUpdating = false;
+    });
   }
 
   @override
@@ -154,7 +282,7 @@ class _ProfileFormState extends State<ProfileForm> {
             obscure: true,
           ),
           TextButton(
-            onPressed: _updateProfile,
+            onPressed: isUpdating ? null : _updateProfile,
             style: TextButton.styleFrom(
               backgroundColor: AppColors.primary,
               padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
@@ -162,16 +290,21 @@ class _ProfileFormState extends State<ProfileForm> {
                 borderRadius: BorderRadius.circular(10),
               ),
             ),
-            child: Text(
-              'Update',
-              style: GoogleFonts.zenKakuGothicAntique(
-                textStyle: TextStyle(
-                  fontSize: 17,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.pageBackground,
-                ),
-              ),
-            ),
+            child: isUpdating
+                ? CircularProgressIndicator(
+                    color: AppColors.pageBackground,
+                    backgroundColor: Colors.transparent,
+                  )
+                : Text(
+                    'Update',
+                    style: GoogleFonts.zenKakuGothicAntique(
+                      textStyle: TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.pageBackground,
+                      ),
+                    ),
+                  ),
           ),
         ],
       ),
