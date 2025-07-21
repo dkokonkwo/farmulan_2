@@ -29,7 +29,6 @@ class _WeatherInfoState extends State<WeatherInfo> {
   @override
   Widget build(BuildContext context) {
     List<double> location = _myBox.get('location', defaultValue: [0.0, 0.0]);
-    print(location);
     return location[0] != 0.0
         ? WeatherAPIData(coordinates: location)
         : GPSLocator();
@@ -56,44 +55,78 @@ class _WeatherAPIDataState extends State<WeatherAPIData> {
   @override
   void initState() {
     super.initState();
-    _loadWeather();
+    _fetchWeather();
   }
 
-  void _loadWeather() async {
+  Future<void> _setCityAndCountry(String city, String country) async {
+    // save farm location's city and country to firestore if not saved already
+    final user = Auth().currentUser;
+    if (user == null) {
+      showErrorToast(context, 'User not signed in');
+      return;
+    }
+
+    final myBox = Hive.box('farmulanDB');
+    final farmId = myBox.get('farmId') as String?;
+    if (farmId == null || farmId.isEmpty) {
+      showErrorToast(context, 'No farm selected');
+      return;
+    }
+
     try {
-      final data = await fetchWeather(widget.coordinates);
+      final farmRef = FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .collection('farms')
+          .doc(farmId);
+
+      final snapshot = await farmRef.get();
+      final data = snapshot.data() ?? {};
+      final needsCity = (data['city'] as String?)?.isEmpty ?? true;
+      final needsCountry = (data['country'] as String?)?.isEmpty ?? true;
+
+      if (needsCity || needsCountry) {
+        await farmRef.set({
+          if (needsCity) 'city': city,
+          if (needsCountry) 'country': country,
+        }, SetOptions(merge: true));
+      }
+
+      // store locally as well
+      await myBox.put('city', city);
+      await myBox.put('country', country);
+
+      if (!mounted) return;
+      showSuccessToast(context, 'Saved farm city and country!');
+    } catch (e) {
+      if (!mounted) return;
+      showErrorToast(context, 'Failed to save city and country: $e');
+    }
+  }
+
+  Future<void> _fetchWeather() async {
+    final uri = Uri.parse(
+      'https://us-central1-iot-farminc.cloudfunctions.net/fetchWeather',
+    );
+    final response = await http.post(
+      uri,
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({'coord': widget.coordinates}),
+    );
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body) as Map<String, dynamic>;
+      if (!mounted) return;
       setState(() {
         country = data['sys']['country'];
         city = data['name'];
         humidity = data['main']['humidity'];
-        wind = (data['wind']['speed'] as double) * 3.6;
-        temp = (data['main']['temp'] as double) - 273.15;
+        wind = (data['wind']['speed'] as num) * 3.6;
+        temp = (data['main']['temp'] as num) - 273.15;
         description = data['weather'][0]['description'];
         icon = data['weather'][0]['icon'];
       });
-    } catch (e) {
-      String message = 'Error fetching weather: $e';
-      showToast(context, message);
-    }
-  }
-
-  Future<Map<String, dynamic>> fetchWeather(List<double> coordinates) async {
-    final String lang = 'EN';
-    final uri = Uri.https('open-weather13.p.rapidapi.com', '/latlon', {
-      'latitude': coordinates[0].toString(),
-      'longitude': coordinates[1].toString(),
-      'lang': lang,
-    });
-    final response = await http.get(
-      uri,
-      headers: {
-        'x-rapidapi-key': '13732c0a24msh0666500c322e5e7p15aebcjsnad58355b049c',
-        'x-rapidapi-host': 'open-weather13.p.rapidapi.com',
-      },
-    );
-
-    if (response.statusCode == 200) {
-      return json.decode(response.body) as Map<String, dynamic>;
+      await _setCityAndCountry(city, country);
     } else {
       throw Exception(
         'Failed to fetch weather (status ${response.statusCode}): ${response.body}',

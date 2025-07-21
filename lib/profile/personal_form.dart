@@ -165,6 +165,7 @@ class _ProfileFormState extends State<ProfileForm> {
       await user.reauthenticateWithCredential(cred);
       return true;
     } on FirebaseAuthException catch (e) {
+      if (!mounted) return false;
       showErrorToast(context, 'Re-authentication failed: ${e.message}');
       return false;
     }
@@ -209,6 +210,7 @@ class _ProfileFormState extends State<ProfileForm> {
       currentPassCtrl.dispose();
 
       if (confirmed == null || confirmed.isEmpty) {
+        if (!mounted) return;
         showErrorToast(context, 'Password confirmation is required');
         setState(() => isUpdating = false);
         return;

@@ -38,7 +38,7 @@ class _HomePageState extends State<HomePage> {
       ),
     ];
 
-    List<MultipleData> multContainerData = [
+    List<MultipleData> multiContainerData = [
       MultipleData(
         icons: [AppIcons.calendar, AppIcons.timer],
         title: "Irrigation Status",
@@ -66,7 +66,7 @@ class _HomePageState extends State<HomePage> {
                 SensorItem(
                   width: bigWidth,
                   height: smallWidth,
-                  child: multContainerData[0],
+                  child: multiContainerData[0],
                 ),
                 SensorItem(
                   width: smallWidth,
