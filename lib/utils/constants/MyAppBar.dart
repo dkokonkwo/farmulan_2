@@ -4,7 +4,6 @@ import 'package:farmulan/utils/constants/icons.dart';
 import 'package:farmulan/utils/constants/plant_details_appbar.dart';
 import 'package:farmulan/utils/constants/toasts.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../../authentication/auth.dart';
 
@@ -66,23 +65,21 @@ class _MyAppBarState extends State<MyAppBar> {
         children: [
           Text(
             'Good Morning!',
-            style: GoogleFonts.zenKakuGothicAntique(
-              textStyle: const TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: AppColors.primary,
-              ),
+            style: TextStyle(
+              fontFamily: 'Zen Kaku Gothic Antique',
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: AppColors.primary,
             ),
           ),
           Text(
             '$firstName $lastName',
-            style: GoogleFonts.zenKakuGothicAntique(
-              textStyle: TextStyle(
-                fontSize: 15,
-                fontWeight: FontWeight.bold,
-                fontStyle: FontStyle.italic,
-                color: AppColors.regularText.withValues(alpha: 0.5),
-              ),
+            style: TextStyle(
+              fontFamily: 'Zen Kaku Gothic Antique',
+              fontSize: 15,
+              fontWeight: FontWeight.bold,
+              fontStyle: FontStyle.italic,
+              color: AppColors.regularText.withValues(alpha: 0.5),
             ),
           ),
         ],

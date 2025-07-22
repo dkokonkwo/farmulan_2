@@ -1,6 +1,5 @@
 import 'package:farmulan/profile/expansion_tiles.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:lottie/lottie.dart';
 
 import '../utils/constants/colors.dart';
@@ -52,12 +51,10 @@ class _ProfilePageState extends State<ProfilePage> {
             SizedBox(height: 20),
             Text(
               'Update Your Profile',
-              style: GoogleFonts.zenKakuGothicAntique(
-                textStyle: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.primary,
-                ),
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: AppColors.primary,
               ),
             ),
             SizedBox(height: 20),

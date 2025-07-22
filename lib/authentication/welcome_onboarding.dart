@@ -1,7 +1,6 @@
 import 'package:farmulan/authentication/login_register.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../utils/constants/colors.dart';
 import '../utils/constants/images.dart';
@@ -33,22 +32,18 @@ class WelcomePage extends StatelessWidget {
                   SizedBox(height: screenHeight / 2.3),
                   Text(
                     'Welcome to FarMulan app',
-                    style: GoogleFonts.zenKakuGothicAntique(
-                      textStyle: TextStyle(
-                        fontSize: 32,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.pageBackground,
-                      ),
+                    style: TextStyle(
+                      fontSize: 32,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.pageBackground,
                     ),
                   ),
                   Text(
                     'Grow your crops efficiently and monitor your farm from any in the world',
-                    style: GoogleFonts.zenKakuGothicAntique(
-                      textStyle: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.normal,
-                        color: AppColors.pageBackground.withValues(alpha: 0.8),
-                      ),
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.normal,
+                      color: AppColors.pageBackground.withValues(alpha: 0.8),
                     ),
                     textAlign: TextAlign.center,
                   ),
@@ -68,12 +63,10 @@ class WelcomePage extends StatelessWidget {
                     child: Center(
                       child: Text(
                         'Register',
-                        style: GoogleFonts.zenKakuGothicAntique(
-                          textStyle: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.primary,
-                          ),
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.primary,
                         ),
                       ),
                     ),
@@ -98,12 +91,10 @@ class WelcomePage extends StatelessWidget {
                     child: Center(
                       child: Text(
                         'Login',
-                        style: GoogleFonts.zenKakuGothicAntique(
-                          textStyle: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.pageBackground,
-                          ),
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.pageBackground,
                         ),
                       ),
                     ),

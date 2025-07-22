@@ -2,7 +2,6 @@ import 'package:farmulan/home/weather_property.dart';
 import 'package:farmulan/utils/constants/colors.dart';
 import 'package:farmulan/utils/constants/icons.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class WeatherWidget extends StatefulWidget {
   const WeatherWidget({super.key});
@@ -48,47 +47,44 @@ class _WeatherWidgetState extends State<WeatherWidget> {
                     children: [
                       Text(
                         'May 17, 2025 10:05 am',
-                        style: GoogleFonts.zenKakuGothicAntique(
-                          textStyle: const TextStyle(
+                        style: TextStyle(
+                            fontFamily: 'Zen Kaku Gothic Antique',
                             fontSize: 15,
                             fontWeight: FontWeight.normal,
                             color: AppColors.authPrimaryText,
                           ),
-                        ),
+
                       ),
                       Text(
                         'Cloudy',
-                        style: GoogleFonts.zenKakuGothicAntique(
-                          textStyle: const TextStyle(
+                        style:  const TextStyle(
+                            fontFamily: 'Zen Kaku Gothic Antique',
                             fontSize: 20,
                             fontWeight: FontWeight.w700,
                             color: AppColors.authPrimaryText,
                           ),
                         ),
-                      ),
                       Text(
                         'Kigali, Rwanda',
-                        style: GoogleFonts.zenKakuGothicAntique(
-                          textStyle: const TextStyle(
+                        style:  const TextStyle(
+                            fontFamily: 'Zen Kaku Gothic Antique',
                             fontSize: 15,
                             fontWeight: FontWeight.normal,
                             color: AppColors.authPrimaryText,
                           ),
                         ),
-                      ),
                     ],
                   ),
                   const Spacer(),
                   Text(
                     '23°c',
-                    style: GoogleFonts.zenKakuGothicAntique(
-                      textStyle: const TextStyle(
+                    style:  const TextStyle(
+                        fontFamily: 'Zen Kaku Gothic Antique',
                         fontSize: 28,
                         fontWeight: FontWeight.w500,
                         color: AppColors.authPrimaryText,
                       ),
                     ),
-                  ),
                 ],
               ),
               const Divider(
@@ -173,47 +169,44 @@ class ForecastContainer extends StatelessWidget {
                     children: [
                       Text(
                         'May 16, 2023 10:05 am',
-                        style: GoogleFonts.zenKakuGothicAntique(
-                          textStyle: const TextStyle(
+                        style:  const TextStyle(
+                            fontFamily: 'Zen Kaku Gothic Antique',
                             fontSize: 15,
                             fontWeight: FontWeight.w600,
                             color: AppColors.mainBg,
                           ),
-                        ),
+
                       ),
                       Text(
                         'Cloudy',
-                        style: GoogleFonts.zenKakuGothicAntique(
-                          textStyle: const TextStyle(
+                        style:  const TextStyle(
+                            fontFamily: 'Zen Kaku Gothic Antique',
                             fontSize: 20,
                             fontWeight: FontWeight.w700,
                             color: AppColors.mainBg,
                           ),
                         ),
-                      ),
                       Text(
                         'Kigali, Rwanda',
-                        style: GoogleFonts.zenKakuGothicAntique(
-                          textStyle: const TextStyle(
+                        style:  const TextStyle(
+                            fontFamily: 'Zen Kaku Gothic Antique',
                             fontSize: 15,
                             fontWeight: FontWeight.w600,
                             color: AppColors.mainBg,
                           ),
                         ),
-                      ),
                     ],
                   ),
                   const Spacer(),
                   Text(
                     '23°c',
-                    style: GoogleFonts.zenKakuGothicAntique(
-                      textStyle: const TextStyle(
+                    style:  const TextStyle(
+                        fontFamily: 'Zen Kaku Gothic Antique',
                         fontSize: 28,
                         fontWeight: FontWeight.w500,
                         color: AppColors.mainBg,
                       ),
                     ),
-                  ),
                 ],
               ),
               const Divider(

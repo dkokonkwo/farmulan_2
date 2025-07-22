@@ -1,7 +1,6 @@
 import 'package:farmulan/utils/constants/icons.dart';
 import 'package:farmulan/utils/constants/images.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:hive/hive.dart';
 
 import '../utils/constants/colors.dart';
@@ -85,25 +84,23 @@ class _HomeBannerState extends State<HomeBanner> {
                     children: [
                       Text(
                         "Charlie's Farm",
-                        style: GoogleFonts.zenKakuGothicAntique(
-                          textStyle: const TextStyle(
+                        style:  const TextStyle(
+                            fontFamily: 'Zen Kaku Gothic Antique',
                             fontSize: 20,
                             fontWeight: FontWeight.w700,
                             color: AppColors.primary,
                           ),
                         ),
-                      ),
 
                       Text(
                         "ID: $_farmId",
-                        style: GoogleFonts.zenKakuGothicAntique(
-                          textStyle: const TextStyle(
+                        style:  const TextStyle(
+                            fontFamily: 'Zen Kaku Gothic Antique',
                             fontSize: 15,
                             fontWeight: FontWeight.normal,
                             color: AppColors.secondary,
                           ),
                         ),
-                      ),
                     ],
                   ),
                   const Spacer(),

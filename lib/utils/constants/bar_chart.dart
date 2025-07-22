@@ -1,6 +1,5 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import 'colors.dart';
 
@@ -38,11 +37,10 @@ class _BarChart extends StatelessWidget {
           ) {
             return BarTooltipItem(
               rod.toY.round().toString(),
-              GoogleFonts.zenKakuGothicAntique(
-                textStyle: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.primaryRed,
-                ),
+              TextStyle(
+                fontFamily: 'Zen Kaku Gothic Antique',
+                fontWeight: FontWeight.bold,
+                color: AppColors.primaryRed,
               ),
             );
           },
@@ -50,12 +48,10 @@ class _BarChart extends StatelessWidget {
   );
 
   Widget getTitles(double value, TitleMeta meta) {
-    final style = GoogleFonts.zenKakuGothicAntique(
-      textStyle: TextStyle(
-        fontSize: 16,
-        fontWeight: FontWeight.bold,
-        color: AppColors.primaryPurple,
-      ),
+    final style = TextStyle(
+      fontSize: 16,
+      fontWeight: FontWeight.bold,
+      color: AppColors.primaryPurple,
     );
     String text;
     switch (value.toInt()) {

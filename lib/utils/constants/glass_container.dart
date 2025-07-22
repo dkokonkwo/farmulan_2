@@ -1,11 +1,10 @@
 import 'package:farmulan/utils/constants/colors.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class GlassContainer extends StatelessWidget {
   final double width;
   final double height;
-  final child;
+  final Widget child;
   GlassContainer({
     super.key,
     required this.width,
@@ -73,23 +72,19 @@ class _SingleDataState extends State<SingleData> {
         ),
         Text(
           widget.title,
-          style: GoogleFonts.zenKakuGothicAntique(
-            textStyle: TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.bold,
-              color: AppColors.regularText.withValues(alpha: 0.5),
-            ),
+          style: TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.bold,
+            color: AppColors.regularText.withValues(alpha: 0.5),
           ),
         ),
 
         Text(
           widget.value,
-          style: GoogleFonts.zenKakuGothicAntique(
-            textStyle: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: AppColors.primary,
-            ),
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: AppColors.primary,
           ),
         ),
       ],
@@ -121,14 +116,13 @@ class _MultipleDataState extends State<MultipleData> {
       children: [
         Text(
           widget.title,
-          style: GoogleFonts.zenKakuGothicAntique(
-            textStyle: TextStyle(
-              fontSize: 15,
-              fontWeight: FontWeight.bold,
-              color: AppColors.regularText.withValues(alpha: 0.5),
-            ),
+          style: TextStyle(
+            fontSize: 15,
+            fontWeight: FontWeight.bold,
+            color: AppColors.regularText.withValues(alpha: 0.5),
           ),
         ),
+
         Row(
           children: [
             ShaderMask(
@@ -146,23 +140,20 @@ class _MultipleDataState extends State<MultipleData> {
               children: [
                 Text(
                   'Last',
-                  style: GoogleFonts.zenKakuGothicAntique(
-                    textStyle: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.regularText.withValues(alpha: 0.5),
-                    ),
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.regularText.withValues(alpha: 0.5),
                   ),
                 ),
+
                 Text(
                   widget.data[0],
-                  style: GoogleFonts.zenKakuGothicAntique(
-                    textStyle: TextStyle(
-                      fontSize: 17,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.primary,
-                      fontStyle: FontStyle.italic,
-                    ),
+                  style: TextStyle(
+                    fontSize: 17,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.primary,
+                    fontStyle: FontStyle.italic,
                   ),
                 ),
               ],
@@ -186,23 +177,20 @@ class _MultipleDataState extends State<MultipleData> {
               children: [
                 Text(
                   'Next',
-                  style: GoogleFonts.zenKakuGothicAntique(
-                    textStyle: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.regularText.withValues(alpha: 0.5),
-                    ),
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.regularText.withValues(alpha: 0.5),
                   ),
                 ),
+
                 Text(
                   widget.data[1],
-                  style: GoogleFonts.zenKakuGothicAntique(
-                    textStyle: TextStyle(
-                      fontSize: 17,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.primary,
-                      fontStyle: FontStyle.italic,
-                    ),
+                  style: TextStyle(
+                    fontSize: 17,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.primary,
+                    fontStyle: FontStyle.italic,
                   ),
                 ),
               ],

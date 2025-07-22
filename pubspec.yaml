@@ -137,6 +137,15 @@ flutter:
   # "family" key with the font family name, and a "fonts" key with a
   # list giving the asset and other descriptors for the font. For
   # example:
+  fonts:
+    - family: Zen Kaku Gothic Antique
+      fonts:
+        - asset: assets/fonts/ZenKakuGothicAntique-Black.ttf
+        - asset: assets/fonts/ZenKakuGothicAntique-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/ZenKakuGothicAntique-Light.ttf
+        - asset: assets/fonts/ZenKakuGothicAntique-Medium.ttf
+        - asset: assets/fonts/ZenKakuGothicAntique-Regular.ttf
   # fonts:
   #   - family: Schyler
   #     fonts:

@@ -6,7 +6,6 @@ import 'package:farmulan/utils/constants/toasts.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:lottie/lottie.dart';
 
 import '../utils/constants/colors.dart';
@@ -67,22 +66,18 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 Text(
                   'Welcome back',
-                  style: GoogleFonts.zenKakuGothicAntique(
-                    textStyle: TextStyle(
-                      fontSize: 35,
-                      fontWeight: FontWeight.w800,
-                      color: AppColors.pageBackground,
-                    ),
+                  style: TextStyle(
+                    fontSize: 35,
+                    fontWeight: FontWeight.w800,
+                    color: AppColors.pageBackground,
                   ),
                 ),
                 Text(
                   'Sign in to access your account',
-                  style: GoogleFonts.zenKakuGothicAntique(
-                    textStyle: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.normal,
-                      color: AppColors.pageBackground.withValues(alpha: 0.7),
-                    ),
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.normal,
+                    color: AppColors.pageBackground.withValues(alpha: 0.7),
                   ),
                 ),
                 SizedBox(height: 50),
@@ -119,12 +114,10 @@ class _LoginPageState extends State<LoginPage> {
                       children: [
                         Text(
                           'Next',
-                          style: GoogleFonts.zenKakuGothicAntique(
-                            textStyle: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.primary,
-                            ),
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.primary,
                           ),
                         ),
                         Icon(AppIcons.rightArrow, color: AppColors.primary),
@@ -139,32 +132,27 @@ class _LoginPageState extends State<LoginPage> {
                   children: [
                     Text(
                       'New member?',
-                      style: GoogleFonts.zenKakuGothicAntique(
-                        textStyle: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.normal,
-                          color: AppColors.pageBackground.withValues(
-                            alpha: 0.7,
-                          ),
-                        ),
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.normal,
+                        color: AppColors.pageBackground.withValues(alpha: 0.7),
                       ),
                     ),
                     GestureDetector(
                       onTap: () => Get.to(SignUpPage()),
                       child: Text(
                         'Register now',
-                        style: GoogleFonts.zenKakuGothicAntique(
-                          textStyle: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.contentColorRed.withValues(
-                              alpha: 0.8,
-                            ),
-                            decoration: TextDecoration.underline,
-                            decorationColor: AppColors.contentColorRed
-                                .withValues(alpha: 0.8), // underline color
-                            decorationThickness: 2.0, // line thickness
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.contentColorRed.withValues(
+                            alpha: 0.8,
                           ),
+                          decoration: TextDecoration.underline,
+                          decorationColor: AppColors.contentColorRed.withValues(
+                            alpha: 0.8,
+                          ), // underline color
+                          decorationThickness: 2.0, // line thickness
                         ),
                       ),
                     ),
@@ -224,12 +212,11 @@ class _SignUpPageState extends State<SignUpPage> {
             Text(
               'Registering...',
               textAlign: TextAlign.center,
-              style: GoogleFonts.zenKakuGothicAntique(
-                textStyle: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w900,
-                  color: AppColors.primaryRed,
-                ),
+              style: TextStyle(
+                fontFamily: 'Zen Kaku Gothic Antique',
+                fontSize: 20,
+                fontWeight: FontWeight.w900,
+                color: AppColors.primaryRed,
               ),
             ),
           ],
@@ -247,7 +234,7 @@ class _SignUpPageState extends State<SignUpPage> {
 
       if (!mounted) return;
       showSuccessToast(context, 'Registration successful');
-      Get.offAll(() => MyNavBar());
+      Get.to(() => MyNavBar());
     } on FirebaseAuthException catch (e) {
       if (!mounted) return;
       showErrorToast(context, 'Registration failed: ${e.message}');
@@ -297,22 +284,18 @@ class _SignUpPageState extends State<SignUpPage> {
                 ),
                 Text(
                   'Getting Started',
-                  style: GoogleFonts.zenKakuGothicAntique(
-                    textStyle: TextStyle(
-                      fontSize: 35,
-                      fontWeight: FontWeight.w800,
-                      color: AppColors.pageBackground,
-                    ),
+                  style: TextStyle(
+                    fontSize: 35,
+                    fontWeight: FontWeight.w800,
+                    color: AppColors.pageBackground,
                   ),
                 ),
                 Text(
                   'by creating your account',
-                  style: GoogleFonts.zenKakuGothicAntique(
-                    textStyle: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.normal,
-                      color: AppColors.pageBackground.withValues(alpha: 0.5),
-                    ),
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.normal,
+                    color: AppColors.pageBackground.withValues(alpha: 0.5),
                   ),
                 ),
                 SizedBox(height: 30),
@@ -372,12 +355,10 @@ class _SignUpPageState extends State<SignUpPage> {
                     ),
                     Text(
                       'By checking the box you agree to our Terms and Conditions',
-                      style: GoogleFonts.zenKakuGothicAntique(
-                        textStyle: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.normal,
-                          color: AppColors.pageBackground,
-                        ),
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.normal,
+                        color: AppColors.pageBackground,
                       ),
                     ),
                   ],
@@ -399,12 +380,10 @@ class _SignUpPageState extends State<SignUpPage> {
                       children: [
                         Text(
                           'Next',
-                          style: GoogleFonts.zenKakuGothicAntique(
-                            textStyle: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.primary,
-                            ),
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.primary,
                           ),
                         ),
                         Icon(AppIcons.rightArrow, color: AppColors.primary),
@@ -419,32 +398,27 @@ class _SignUpPageState extends State<SignUpPage> {
                   children: [
                     Text(
                       'Already a member?',
-                      style: GoogleFonts.zenKakuGothicAntique(
-                        textStyle: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.normal,
-                          color: AppColors.pageBackground.withValues(
-                            alpha: 0.7,
-                          ),
-                        ),
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.normal,
+                        color: AppColors.pageBackground.withValues(alpha: 0.7),
                       ),
                     ),
                     GestureDetector(
                       onTap: () => Get.to(LoginPage()),
                       child: Text(
                         'Login',
-                        style: GoogleFonts.zenKakuGothicAntique(
-                          textStyle: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.pageBackground.withValues(
-                              alpha: 0.8,
-                            ),
-                            decoration: TextDecoration.underline,
-                            decorationColor: AppColors.pageBackground
-                                .withValues(alpha: 0.8), // underline color
-                            decorationThickness: 2.0,
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.pageBackground.withValues(
+                            alpha: 0.8,
                           ),
+                          decoration: TextDecoration.underline,
+                          decorationColor: AppColors.pageBackground.withValues(
+                            alpha: 0.8,
+                          ), // underline color
+                          decorationThickness: 2.0,
                         ),
                       ),
                     ),
@@ -497,12 +471,10 @@ class _AuthFormFieldState extends State<AuthFormField> {
         keyboardType: widget.keyboardType,
         autofillHints: widget.autofillHints,
         obscureText: widget.toggleIcon != null ? obscure : false,
-        style: GoogleFonts.zenKakuGothicAntique(
-          textStyle: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.normal,
-            color: AppColors.pageBackground,
-          ),
+        style: TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.normal,
+          color: AppColors.pageBackground,
         ),
         decoration: InputDecoration(
           suffixIcon: widget.toggleIcon == null
@@ -521,19 +493,15 @@ class _AuthFormFieldState extends State<AuthFormField> {
                     });
                   },
                 ),
-          labelStyle: GoogleFonts.zenKakuGothicAntique(
-            textStyle: TextStyle(
-              fontSize: 15,
-              fontWeight: FontWeight.normal,
-              color: AppColors.pageBackground.withValues(alpha: 0.8),
-            ),
+          labelStyle: TextStyle(
+            fontSize: 15,
+            fontWeight: FontWeight.normal,
+            color: AppColors.pageBackground.withValues(alpha: 0.8),
           ),
-          hintStyle: GoogleFonts.zenKakuGothicAntique(
-            textStyle: TextStyle(
-              fontSize: 15,
-              fontWeight: FontWeight.normal,
-              color: AppColors.pageBackground.withValues(alpha: 0.8),
-            ),
+          hintStyle: TextStyle(
+            fontSize: 15,
+            fontWeight: FontWeight.normal,
+            color: AppColors.pageBackground.withValues(alpha: 0.8),
           ),
           border: OutlineInputBorder(),
           labelText: widget.fieldName,

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../utils/constants/colors.dart';
 
@@ -56,24 +55,20 @@ class _SensorTabState extends State<SensorTab> {
           ),
           Text(
             widget.title,
-            style: GoogleFonts.zenKakuGothicAntique(
-              textStyle: TextStyle(
+            style: TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.w700,
                 color: AppColors.regularText.withValues(alpha: 0.5),
               ),
             ),
-          ),
           Text(
             widget.value,
-            style: GoogleFonts.zenKakuGothicAntique(
-              textStyle: TextStyle(
+            style:  TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
                 color: AppColors.regularText.withValues(alpha: 0.7),
               ),
             ),
-          ),
         ],
       ),
     );

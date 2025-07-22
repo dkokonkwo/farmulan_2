@@ -8,7 +8,6 @@ import 'package:farmulan/utils/constants/icons.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class ProfileExpansionTiles extends StatefulWidget {
   const ProfileExpansionTiles({super.key});
@@ -55,25 +54,21 @@ class _ProfileExpansionTilesState extends State<ProfileExpansionTiles> {
           leading: ExpansionLeadingIcon(icon: profileIcons[index]),
           title: Text(
             profileTitles[index],
-            style: GoogleFonts.zenKakuGothicAntique(
-              textStyle: TextStyle(
+            style:  TextStyle(
                 fontSize: 17,
                 fontWeight: FontWeight.bold,
                 color: AppColors.regularText.withValues(alpha: 0.8),
               ),
             ),
-          ),
           subtitle: Text(
             profileSubheadings[index],
-            style: GoogleFonts.zenKakuGothicAntique(
-              textStyle: TextStyle(
+            style:  TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.normal,
                 fontStyle: FontStyle.italic,
                 color: AppColors.regularText.withValues(alpha: 0.5),
               ),
             ),
-          ),
           showTrailingIcon: !isLogout,
           children: isLogout ? const [] : [tileBodyList[index]],
           onExpansionChanged: (bool expanded) {

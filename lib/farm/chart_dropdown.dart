@@ -1,6 +1,5 @@
 import 'package:farmulan/utils/constants/icons.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../utils/constants/colors.dart';
 
@@ -36,11 +35,10 @@ class _ChartDropdownState extends State<ChartDropdown> {
         label: name,
         labelWidget: Text(
           name,
-          style: GoogleFonts.zenKakuGothicAntique(
-            textStyle: const TextStyle(
-              fontSize: 17,
-              color: AppColors.regularText,
-            ),
+          style: TextStyle(
+            fontFamily: 'Zen Kaku Gothic Antique',
+            fontSize: 17,
+            color: AppColors.regularText,
           ),
         ),
       );
@@ -58,9 +56,7 @@ class _ChartDropdownState extends State<ChartDropdown> {
         borderRadius: BorderRadius.circular(10),
       ),
       child: DropdownButton(
-        style: GoogleFonts.zenKakuGothicAntique(
-          textStyle: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-        ),
+        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
         isExpanded: true,
         borderRadius: BorderRadius.circular(22),
         icon: Icon(
@@ -77,12 +73,10 @@ class _ChartDropdownState extends State<ChartDropdown> {
             value: titleList[index],
             child: Text(
               titleList[index],
-              style: GoogleFonts.zenKakuGothicAntique(
-                textStyle: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.normal,
-                  color: AppColors.regularText.withValues(alpha: 0.6),
-                ),
+              style: TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.normal,
+                color: AppColors.regularText.withValues(alpha: 0.6),
               ),
             ),
           ),

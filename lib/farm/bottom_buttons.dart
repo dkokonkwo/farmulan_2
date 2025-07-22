@@ -2,7 +2,6 @@ import 'package:farmulan/utils/constants/colors.dart';
 import 'package:farmulan/utils/constants/icons.dart';
 import 'package:flutter/material.dart' hide BoxDecoration, BoxShadow;
 import 'package:flutter_inset_box_shadow/flutter_inset_box_shadow.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class BottomButtons extends StatefulWidget {
   final ValueChanged<int> changeIndex;
@@ -47,12 +46,10 @@ class _BottomButtonsState extends State<BottomButtons> {
               ),
               Text(
                 iconTitles[index],
-                style: GoogleFonts.zenKakuGothicAntique(
-                  textStyle: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.regularText.withValues(alpha: 0.7),
-                  ),
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.regularText.withValues(alpha: 0.7),
                 ),
               ),
             ],

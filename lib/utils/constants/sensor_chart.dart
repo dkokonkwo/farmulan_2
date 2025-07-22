@@ -1,7 +1,6 @@
 import 'package:fl_chart/fl_chart.dart';
 // import 'package:fl_chart_app/presentation/resources/app_resources.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import 'colors.dart';
 
@@ -44,12 +43,11 @@ class _LineChartSample2State extends State<LineChartSample2> {
             },
             child: Text(
               'avg',
-              style: GoogleFonts.zenKakuGothicAntique(
-                textStyle: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.normal,
-                  color: AppColors.authPrimaryText,
-                ),
+              style: TextStyle(
+                fontFamily: 'Zen Kaku Gothic Antique',
+                fontSize: 16,
+                fontWeight: FontWeight.normal,
+                color: AppColors.authPrimaryText,
               ),
             ),
           ),
@@ -59,12 +57,11 @@ class _LineChartSample2State extends State<LineChartSample2> {
   }
 
   Widget bottomTitleWidgets(double value, TitleMeta meta) {
-    TextStyle style = GoogleFonts.zenKakuGothicAntique(
-      textStyle: const TextStyle(
-        fontSize: 16,
-        fontWeight: FontWeight.w700,
-        color: AppColors.subheadingText,
-      ),
+    TextStyle style = TextStyle(
+      fontFamily: 'Zen Kaku Gothic Antique',
+      fontSize: 16,
+      fontWeight: FontWeight.w700,
+      color: AppColors.subheadingText,
     );
     Widget text;
     switch (value.toInt()) {
@@ -92,12 +89,11 @@ class _LineChartSample2State extends State<LineChartSample2> {
   }
 
   Widget leftTitleWidgets(double value, TitleMeta meta) {
-    TextStyle style = GoogleFonts.zenKakuGothicAntique(
-      textStyle: const TextStyle(
-        fontSize: 16,
-        fontWeight: FontWeight.w500,
-        color: AppColors.authPrimaryText,
-      ),
+    TextStyle style = TextStyle(
+      fontFamily: 'Zen Kaku Gothic Antique',
+      fontSize: 16,
+      fontWeight: FontWeight.w500,
+      color: AppColors.authPrimaryText,
     );
     String text;
     switch (value.toInt()) {

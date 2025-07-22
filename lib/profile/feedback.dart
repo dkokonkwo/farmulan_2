@@ -1,6 +1,5 @@
 import 'package:farmulan/utils/constants/icons.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:toastification/toastification.dart';
 
 import '../utils/constants/colors.dart';
@@ -19,7 +18,6 @@ class _FeedbackFormState extends State<FeedbackForm> {
   void _sendMessage() {
     final message = _controller.text.trim();
     if (message.isEmpty) return;
-    print('Sending message: $message');
     showToast(context);
   }
 
@@ -48,16 +46,13 @@ class _FeedbackFormState extends State<FeedbackForm> {
             controller: _controller,
             minLines: 3,
             maxLines: 6,
-            style: GoogleFonts.zenKakuGothicAntique(
-              textStyle: TextStyle(fontSize: 16, color: AppColors.primary),
-            ),
+            style: TextStyle(fontSize: 16, color: AppColors.primary),
+
             decoration: InputDecoration(
               hintText: 'Type your feedback…',
-              hintStyle: GoogleFonts.zenKakuGothicAntique(
-                textStyle: TextStyle(
-                  fontSize: 15,
-                  color: AppColors.regularText.withValues(alpha: 0.8),
-                ),
+              hintStyle: TextStyle(
+                fontSize: 15,
+                color: AppColors.regularText.withValues(alpha: 0.8),
               ),
               filled: true,
               fillColor: Color(0xffF4F7FB),

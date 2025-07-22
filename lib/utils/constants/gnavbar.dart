@@ -4,7 +4,6 @@ import 'package:farmulan/utils/constants/colors.dart';
 import 'package:farmulan/utils/constants/icons.dart';
 import 'package:farmulan/utils/constants/navigation.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 
 class GNavBar extends StatefulWidget {
@@ -61,12 +60,11 @@ class _GNavBarState extends State<GNavBar> {
             tabBorderRadius: 20.0,
             tabMargin: const EdgeInsets.all(5),
             iconSize: 30,
-            textStyle: GoogleFonts.zenKakuGothicAntique(
-              textStyle: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: AppColors.primary,
-              ),
+            textStyle: TextStyle(
+              fontFamily: 'Zen Kaku Gothic Antique',
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: AppColors.primary,
             ),
             gap: 15,
             padding: const EdgeInsets.all(8),

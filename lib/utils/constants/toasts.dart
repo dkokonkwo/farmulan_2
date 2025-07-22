@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:toastification/toastification.dart';
 
 import 'colors.dart';
@@ -13,12 +12,10 @@ void showSuccessToast(BuildContext context, String message) {
     title: const Text('Successful!'),
     description: Text(
       message,
-      style: GoogleFonts.zenKakuGothicAntique(
-        textStyle: TextStyle(
-          fontSize: 16,
-          fontWeight: FontWeight.normal,
-          color: AppColors.contentColorGreen,
-        ),
+      style: TextStyle(
+        fontSize: 16,
+        fontWeight: FontWeight.normal,
+        color: AppColors.contentColorGreen,
       ),
     ),
     autoCloseDuration: const Duration(seconds: 8),
@@ -35,12 +32,10 @@ void showErrorToast(BuildContext context, String message) {
     title: const Text('Error!'),
     description: Text(
       message,
-      style: GoogleFonts.zenKakuGothicAntique(
-        textStyle: TextStyle(
-          fontSize: 16,
-          fontWeight: FontWeight.normal,
-          color: AppColors.contentColorRed,
-        ),
+      style: TextStyle(
+        fontSize: 16,
+        fontWeight: FontWeight.normal,
+        color: AppColors.contentColorRed,
       ),
     ),
     autoCloseDuration: const Duration(seconds: 8),
@@ -57,12 +52,10 @@ void showInfoToast(BuildContext context, String message) {
     title: const Text('Info!'),
     description: Text(
       message,
-      style: GoogleFonts.zenKakuGothicAntique(
-        textStyle: TextStyle(
-          fontSize: 16,
-          fontWeight: FontWeight.normal,
-          color: AppColors.pageBackground,
-        ),
+      style: TextStyle(
+        fontSize: 16,
+        fontWeight: FontWeight.normal,
+        color: AppColors.pageBackground,
       ),
     ),
     autoCloseDuration: const Duration(seconds: 3),

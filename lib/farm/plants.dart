@@ -8,7 +8,7 @@ import 'package:farmulan/utils/constants/icons.dart';
 import 'package:farmulan/utils/constants/images.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart';
+
 
 class PlantContainerClipper extends CustomClipper<Path> {
   @override
@@ -119,36 +119,31 @@ class _CustomPlantContainerState extends State<CustomPlantContainer> {
                           SizedBox(width: 5),
                           Text(
                             widget.isGrowing ? "Growing" : "Not planted",
-                            style: GoogleFonts.zenKakuGothicAntique(
-                              textStyle: TextStyle(
+                            style:  TextStyle(
                                 fontSize: 15,
                                 fontWeight: FontWeight.normal,
                                 color: AppColors.mainBg,
                               ),
                             ),
-                          ),
+
                         ],
                       ),
                       Text(
                         widget.name,
-                        style: GoogleFonts.zenKakuGothicAntique(
-                          textStyle: TextStyle(
+                        style:  TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
                             color: AppColors.white,
                           ),
                         ),
-                      ),
                       Text(
                         "Planted ${widget.timeOfPlant} days ago",
-                        style: GoogleFonts.zenKakuGothicAntique(
-                          textStyle: TextStyle(
+                        style:  TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.normal,
                             color: AppColors.mainBg,
                           ),
                         ),
-                      ),
                     ],
                   ),
                 ],
@@ -193,9 +188,13 @@ class _PlantsTabState extends State<PlantsTab>
       PlantInfo("Tomatoes", true, AppImages.tomatoes, 8),
       PlantInfo("Lettuce", true, AppImages.lettuce, 8),
     ];
+
+    final double crops = 2.0;
+    final numOfBoxes = (crops / 2).ceil();
+
     return Column(
-      children: [
-        SizedBox(
+      children: List.generate(numOfBoxes, (index) {
+        return SizedBox(
           height: height,
           width: width,
           child: Stack(
@@ -205,11 +204,11 @@ class _PlantsTabState extends State<PlantsTab>
                 left: 0,
                 child: GestureDetector(
                   onTap: () {
-                    Get.to(PlantDetails(index: 0));
+                    Get.to(PlantDetails(index: index * 2));
                   },
                   child: PlantItem(
-                    plantInfo: plantAppBarData[0],
-                    imgUrl: addedPlants[0].imgUrl,
+                    plantInfo: plantAppBarData[index * 2],
+                    imgUrl: addedPlants[index * 2].imgUrl,
                   ),
                 ),
               ),
@@ -218,52 +217,18 @@ class _PlantsTabState extends State<PlantsTab>
                 right: 0,
                 child: GestureDetector(
                   onTap: () {
-                    Get.to(PlantDetails(index: 1));
+                    Get.to(PlantDetails(index: (index * 2) + 1));
                   },
                   child: PlantItem(
-                    plantInfo: plantAppBarData[1],
-                    imgUrl: addedPlants[1].imgUrl,
+                    plantInfo: plantAppBarData[(index * 2) + 1],
+                    imgUrl: addedPlants[(index * 2) + 1].imgUrl,
                   ),
                 ),
               ),
             ],
           ),
-        ),
-        SizedBox(
-          height: height,
-          width: width,
-          child: Stack(
-            children: [
-              Positioned(
-                top: 25,
-                left: 0,
-                child: GestureDetector(
-                  onTap: () {
-                    Get.to(PlantDetails(index: 2));
-                  },
-                  child: PlantItem(
-                    plantInfo: plantAppBarData[2],
-                    imgUrl: addedPlants[0].imgUrl,
-                  ),
-                ),
-              ),
-              Positioned(
-                top: 0,
-                right: 0,
-                child: GestureDetector(
-                  onTap: () {
-                    Get.to(PlantDetails(index: 3));
-                  },
-                  child: PlantItem(
-                    plantInfo: plantAppBarData[1],
-                    imgUrl: addedPlants[1].imgUrl,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
+        );
+      }),
     );
   }
 }

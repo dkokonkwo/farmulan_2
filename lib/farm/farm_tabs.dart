@@ -1,7 +1,6 @@
 import 'package:farmulan/utils/constants/colors.dart';
 import 'package:flutter/material.dart' hide BoxDecoration, BoxShadow;
 import 'package:flutter_inset_box_shadow/flutter_inset_box_shadow.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class CustomFarmTab extends StatefulWidget {
   final bool isSelected;
@@ -61,12 +60,10 @@ class _CustomFarmTabState extends State<CustomFarmTab> {
       ),
       child: Text(
         widget.title,
-        style: GoogleFonts.zenKakuGothicAntique(
-          textStyle: TextStyle(
-            fontSize: 15,
-            fontWeight: FontWeight.bold,
-            color: widget.isSelected ? AppColors.primary : AppColors.mainBg,
-          ),
+        style: TextStyle(
+          fontSize: 15,
+          fontWeight: FontWeight.bold,
+          color: widget.isSelected ? AppColors.primary : AppColors.mainBg,
         ),
       ),
     );
@@ -112,14 +109,12 @@ class _FarmOptionsState extends State<FarmOptions> {
       ),
       child: Text(
         widget.title,
-        style: GoogleFonts.zenKakuGothicAntique(
-          textStyle: TextStyle(
-            fontSize: 15,
-            fontWeight: FontWeight.bold,
-            color: widget.isSelected
-                ? AppColors.primary
-                : AppColors.regularText.withValues(alpha: 0.6),
-          ),
+        style: TextStyle(
+          fontSize: 15,
+          fontWeight: FontWeight.bold,
+          color: widget.isSelected
+              ? AppColors.primary
+              : AppColors.regularText.withValues(alpha: 0.6),
         ),
       ),
     );

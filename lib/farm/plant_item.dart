@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../utils/constants/colors.dart';
 import '../utils/constants/icons.dart';
@@ -69,35 +68,29 @@ class _PlantItemState extends State<PlantItem> {
                     SizedBox(width: 5),
                     Text(
                       widget.plantInfo[3],
-                      style: GoogleFonts.zenKakuGothicAntique(
-                        textStyle: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.normal,
-                          color: AppColors.regularText.withValues(alpha: 0.5),
-                        ),
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.normal,
+                        color: AppColors.regularText.withValues(alpha: 0.5),
                       ),
                     ),
                   ],
                 ),
                 Text(
                   widget.plantInfo[0],
-                  style: GoogleFonts.zenKakuGothicAntique(
-                    textStyle: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.regularText.withValues(alpha: 0.7),
-                    ),
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.regularText.withValues(alpha: 0.7),
                   ),
                 ),
                 Text(
                   "Planted ${widget.plantInfo[1]} days ago",
-                  style: GoogleFonts.zenKakuGothicAntique(
-                    textStyle: TextStyle(
-                      fontSize: 13,
-                      color: AppColors.regularText.withValues(alpha: 0.5),
-                      fontWeight: FontWeight.bold,
-                      fontStyle: FontStyle.italic,
-                    ),
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: AppColors.regularText.withValues(alpha: 0.5),
+                    fontWeight: FontWeight.bold,
+                    fontStyle: FontStyle.italic,
                   ),
                 ),
               ],

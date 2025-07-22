@@ -4,7 +4,6 @@ import 'package:farmulan/utils/constants/colors.dart';
 import 'package:farmulan/utils/constants/toasts.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class CustomTextField extends StatelessWidget {
   final String label;
@@ -38,31 +37,25 @@ class CustomTextField extends StatelessWidget {
       ),
       child: TextField(
         controller: controller,
-        style: GoogleFonts.zenKakuGothicAntique(
-          textStyle: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.normal,
-            color: AppColors.primary,
-          ),
+        style: TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.normal,
+          color: AppColors.primary,
         ),
         obscureText: obscure,
         decoration: InputDecoration(
-          labelText: label,
-          labelStyle: GoogleFonts.zenKakuGothicAntique(
-            textStyle: TextStyle(
-              fontSize: 15,
-              fontWeight: FontWeight.normal,
-              color: AppColors.regularText.withValues(alpha: 0.8),
-            ),
-          ),
-          hintStyle: GoogleFonts.zenKakuGothicAntique(
-            textStyle: TextStyle(
-              fontSize: 15,
-              fontWeight: FontWeight.normal,
-              color: AppColors.regularText.withValues(alpha: 0.8),
-            ),
-          ),
           border: OutlineInputBorder(),
+          labelText: label,
+          labelStyle: TextStyle(
+            fontSize: 15,
+            fontWeight: FontWeight.normal,
+            color: AppColors.regularText.withValues(alpha: 0.8),
+          ),
+          hintStyle: TextStyle(
+            fontSize: 15,
+            fontWeight: FontWeight.normal,
+            color: AppColors.regularText.withValues(alpha: 0.8),
+          ),
           contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 5),
           // The default border (when not focused)
           enabledBorder: OutlineInputBorder(
@@ -299,12 +292,10 @@ class _ProfileFormState extends State<ProfileForm> {
                   )
                 : Text(
                     'Update',
-                    style: GoogleFonts.zenKakuGothicAntique(
-                      textStyle: TextStyle(
-                        fontSize: 17,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.pageBackground,
-                      ),
+                    style: TextStyle(
+                      fontSize: 17,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.pageBackground,
                     ),
                   ),
           ),

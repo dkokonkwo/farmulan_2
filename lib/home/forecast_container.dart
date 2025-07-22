@@ -5,11 +5,9 @@ import 'package:farmulan/authentication/auth.dart';
 import 'package:farmulan/home/weather_property.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:hive/hive.dart';
+import 'package:hive_flutter/adapters.dart';
 import 'package:http/http.dart' as http;
 import 'package:lottie/lottie.dart';
-import 'package:toastification/toastification.dart';
 
 import '../utils/constants/colors.dart';
 import '../utils/constants/icons.dart';
@@ -28,10 +26,14 @@ class _WeatherInfoState extends State<WeatherInfo> {
 
   @override
   Widget build(BuildContext context) {
-    List<double> location = _myBox.get('location', defaultValue: [0.0, 0.0]);
-    return location[0] != 0.0
-        ? WeatherAPIData(coordinates: location)
-        : GPSLocator();
+    return ValueListenableBuilder(
+      valueListenable: _myBox.listenable(keys: ['location']),
+      builder: (context, Box b, _) {
+        final loc = b.get('location', defaultValue: [0.0, 0.0]) as List<double>;
+
+        return loc[0] != 0.0 ? WeatherAPIData(coordinates: loc) : GPSLocator();
+      },
+    );
   }
 }
 
@@ -93,11 +95,16 @@ class _WeatherAPIDataState extends State<WeatherAPIData> {
       }
 
       // store locally as well
-      await myBox.put('city', city);
-      await myBox.put('country', country);
+      final String? savedCity = myBox.get('city') as String?;
 
-      if (!mounted) return;
-      showSuccessToast(context, 'Saved farm city and country!');
+      // If we haven't, write both city & country
+      if (savedCity == null || savedCity.isEmpty) {
+        await myBox.put('city', city);
+        await myBox.put('country', country);
+
+        if (!mounted) return;
+        showSuccessToast(context, 'Saved farm city and country!');
+      }
     } catch (e) {
       if (!mounted) return;
       showErrorToast(context, 'Failed to save city and country: $e');
@@ -105,16 +112,18 @@ class _WeatherAPIDataState extends State<WeatherAPIData> {
   }
 
   Future<void> _fetchWeather() async {
-    final uri = Uri.parse(
-      'https://us-central1-iot-farminc.cloudfunctions.net/fetchWeather',
-    );
-    final response = await http.post(
-      uri,
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({'coord': widget.coordinates}),
-    );
-
-    if (response.statusCode == 200) {
+    final uri = Uri.parse('https://fetchweather-e4ldvx4z3a-uc.a.run.app');
+    try {
+      final response = await http.post(
+        uri,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'coord': widget.coordinates}),
+      );
+      if (response.statusCode != 200) {
+        throw Exception(
+          'Failed to fetch weather (status ${response.statusCode}): ${response.body}',
+        );
+      }
       final data = json.decode(response.body) as Map<String, dynamic>;
       if (!mounted) return;
       setState(() {
@@ -127,24 +136,10 @@ class _WeatherAPIDataState extends State<WeatherAPIData> {
         icon = data['weather'][0]['icon'];
       });
       await _setCityAndCountry(city, country);
-    } else {
-      throw Exception(
-        'Failed to fetch weather (status ${response.statusCode}): ${response.body}',
-      );
+    } catch (e) {
+      if (!mounted) return;
+      showErrorToast(context, 'Could not load weather: $e');
     }
-  }
-
-  void showToast(BuildContext context, Object message) {
-    toastification.show(
-      context: context,
-      type: ToastificationType.error,
-      // Change to error, warning, or info as needed
-      style: ToastificationStyle.flat,
-      title: const Text('Error!'),
-      description: Text('$message'),
-      autoCloseDuration: const Duration(seconds: 3),
-      icon: const Icon(Icons.error, color: AppColors.pageBackground),
-    );
   }
 
   @override
@@ -182,22 +177,20 @@ class _WeatherAPIDataState extends State<WeatherAPIData> {
                 children: [
                   Text(
                     city,
-                    style: GoogleFonts.zenKakuGothicAntique(
-                      textStyle: const TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.mainBg,
-                      ),
+                    style: TextStyle(
+                      fontFamily: 'Zen Kaku Gothic Antique',
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.mainBg,
                     ),
                   ),
                   Text(
                     country,
-                    style: GoogleFonts.zenKakuGothicAntique(
-                      textStyle: const TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.mainBg,
-                      ),
+                    style: TextStyle(
+                      fontFamily: 'Zen Kaku Gothic Antique',
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.mainBg,
                     ),
                   ),
                 ],
@@ -226,33 +219,41 @@ class _WeatherAPIDataState extends State<WeatherAPIData> {
             children: [
               Row(
                 children: [
-                  Image.network(
-                    'https://openweathermap.org/img/wn/$icon@2x.png',
-                    width: 30,
-                    height: 30,
-                    fit: BoxFit.cover,
-                  ),
+                  icon.isNotEmpty
+                      ? Image.network(
+                          'https://openweathermap.org/img/wn/$icon@2x.png',
+                          width: 30,
+                          height: 30,
+                          fit: BoxFit.cover,
+                        )
+                      : SizedBox(
+                          width: 30,
+                          height: 30,
+                          child: Center(
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: AppColors.pageBackground,
+                            ),
+                          ),
+                        ),
                   SizedBox(width: 10),
                   Text(
                     description,
-                    style: GoogleFonts.zenKakuGothicAntique(
-                      textStyle: TextStyle(
+                    style:  TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w600,
                         color: AppColors.mainBg.withValues(alpha: 0.7),
                       ),
                     ),
-                  ),
                 ],
               ),
               Text(
                 '${temp.toStringAsFixed(1)}°C',
-                style: GoogleFonts.zenKakuGothicAntique(
-                  textStyle: const TextStyle(
-                    fontSize: 25,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.mainBg,
-                  ),
+                style: TextStyle(
+                  fontFamily: 'Zen Kaku Gothic Antique',
+                  fontSize: 25,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.mainBg,
                 ),
               ),
             ],
@@ -273,7 +274,7 @@ class GPSLocator extends StatefulWidget {
 class _GPSLocatorState extends State<GPSLocator> {
   final _myBox = Hive.box('farmulanDB');
 
-  void _askForLocation() {
+  void _askForLocation() async {
     showDialog(
       barrierDismissible: false,
       context: context,
@@ -287,29 +288,18 @@ class _GPSLocatorState extends State<GPSLocator> {
             Text(
               'Please wait, fetching Location...',
               textAlign: TextAlign.center,
-              style: GoogleFonts.zenKakuGothicAntique(
-                textStyle: const TextStyle(
+              style: const TextStyle(
+                  fontFamily: 'Zen Kaku Gothic Antique',
                   fontSize: 20,
                   fontWeight: FontWeight.w900,
                   color: AppColors.primaryRed,
                 ),
               ),
-            ),
           ],
         ),
       ),
     );
 
-    popDialog() {
-      if (mounted) {
-        Navigator.of(context, rootNavigator: true).pop();
-      }
-    }
-
-    _getLocationAndStore().whenComplete(popDialog);
-  }
-
-  Future<void> _getLocationAndStore() async {
     final user = Auth().currentUser;
     if (user == null) {
       showErrorToast(context, 'User not signed in');
@@ -318,7 +308,7 @@ class _GPSLocatorState extends State<GPSLocator> {
 
     if (!await Geolocator.isLocationServiceEnabled()) {
       if (!mounted) return;
-      showToast(context, 'Location services are disabled.');
+      showErrorToast(context, 'Location services are disabled.');
       return;
     }
 
@@ -331,31 +321,23 @@ class _GPSLocatorState extends State<GPSLocator> {
     if (permission != LocationPermission.always &&
         permission != LocationPermission.whileInUse) {
       if (!mounted) return;
-      showToast(context, 'Location permission denied.');
+      showErrorToast(context, 'Location permission denied.');
       return;
     }
 
     // fetch the position and store in hive
     Position pos;
+
+    // Create a new farm document with auto-ID, then set its data
     try {
       pos = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,
       );
-      await _myBox.put('location', [pos.latitude, pos.longitude]);
-      setState(() {});
-    } catch (e) {
-      if (!mounted) return;
-      showToast(context, e);
-      return;
-    }
-
-    // Create a new farm document with auto-ID, then set its data
-    try {
       final farmRef = FirebaseFirestore.instance
           .collection('users')
           .doc(user.uid)
           .collection('farms')
-          .doc('');
+          .doc();
 
       final farmId = farmRef.id;
       await farmRef.set({
@@ -363,26 +345,16 @@ class _GPSLocatorState extends State<GPSLocator> {
         'createdAt': Timestamp.now(),
       });
 
+      if (mounted) Navigator.of(context, rootNavigator: true).pop();
+
+      await _myBox.put('location', [pos.latitude, pos.longitude]);
       await _myBox.put('farmId', farmId);
       if (!mounted) return;
       showSuccessToast(context, 'Farm created with ID $farmId');
     } catch (e) {
       if (!mounted) return;
-      showErrorToast(context, 'Failed to create farm: $e');
+      showErrorToast(context, 'Failed to get location or set farm details: $e');
     }
-  }
-
-  void showToast(BuildContext context, Object message) {
-    toastification.show(
-      context: context,
-      type: ToastificationType.error,
-      // Change to error, warning, or info as needed
-      style: ToastificationStyle.flat,
-      title: const Text('Error!'),
-      description: Text('$message'),
-      autoCloseDuration: const Duration(seconds: 3),
-      icon: const Icon(Icons.error, color: AppColors.pageBackground),
-    );
   }
 
   @override
@@ -410,12 +382,11 @@ class _GPSLocatorState extends State<GPSLocator> {
             'If you’re standing at your farm right now, tap GPS button below to automatically fetch your location. '
             'Otherwise, go to your Profile page to manually add your farm location.',
             textAlign: TextAlign.center,
-            style: GoogleFonts.zenKakuGothicAntique(
-              textStyle: const TextStyle(
-                fontSize: 15,
-                fontWeight: FontWeight.w600,
-                color: AppColors.primary,
-              ),
+            style: TextStyle(
+              fontFamily: 'Zen Kaku Gothic Antique',
+              fontSize: 15,
+              fontWeight: FontWeight.w600,
+              color: AppColors.primary,
             ),
           ),
           NeumorphicButton(icon: AppIcons.gps, onTap: _askForLocation),

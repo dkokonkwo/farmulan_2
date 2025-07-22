@@ -2,9 +2,6 @@ import 'package:farmulan/utils/constants/colors.dart';
 import 'package:farmulan/utils/constants/icons.dart';
 import 'package:flutter/material.dart' hide BoxDecoration, BoxShadow;
 import 'package:flutter_inset_box_shadow/flutter_inset_box_shadow.dart';
-import 'package:google_fonts/google_fonts.dart';
-
-// Plant info is list that contains, plant name, time since planted, growth stage
 
 class PlantDetailsAppBar extends StatefulWidget implements PreferredSizeWidget {
   final List<String> plantInfo;
@@ -34,13 +31,12 @@ class _PlantDetailsAppBarState extends State<PlantDetailsAppBar> {
       ),
       title: Text(
         widget.plantInfo[0],
-        style: GoogleFonts.zenKakuGothicAntique(
-          textStyle: TextStyle(
+        style: 
+           TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,
             color: AppColors.pageHeadingText,
           ),
-        ),
       ),
       actions: [
         NeumorphicButton(
@@ -121,13 +117,12 @@ void showInfoDialog(BuildContext context, List<String> plantInfo) {
           Icon(AppIcons.leaf, color: AppColors.regularText),
           Text(
             plantInfo[0],
-            style: GoogleFonts.zenKakuGothicAntique(
-              textStyle: TextStyle(
+            style: 
+               TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
                 color: AppColors.regularText,
               ),
-            ),
           ),
         ],
       ),
@@ -145,39 +140,37 @@ void showInfoDialog(BuildContext context, List<String> plantInfo) {
           SizedBox(width: 7),
           Text(
             'Growth Stage',
-            style: GoogleFonts.zenKakuGothicAntique(
-              textStyle: TextStyle(
+            style: 
+               TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.bold,
                 color: AppColors.regularText.withValues(alpha: 0.5),
               ),
-            ),
+
           ),
           SizedBox(width: 15),
           Text(
             plantInfo[2],
-            style: GoogleFonts.zenKakuGothicAntique(
-              textStyle: TextStyle(
+            style: 
+               TextStyle(
                 fontSize: 17,
                 fontWeight: FontWeight.bold,
                 color: AppColors.regularText.withValues(alpha: 0.7),
                 fontStyle: FontStyle.italic,
               ),
             ),
-          ),
         ],
       ),
       actions: <Widget>[
         Text(
           'Planted ${plantInfo[1]} days ago',
-          style: GoogleFonts.zenKakuGothicAntique(
-            textStyle: TextStyle(
+          style: 
+             TextStyle(
               fontSize: 15,
               fontWeight: FontWeight.bold,
               color: AppColors.regularText,
               fontStyle: FontStyle.italic,
             ),
-          ),
         ),
       ],
     ),

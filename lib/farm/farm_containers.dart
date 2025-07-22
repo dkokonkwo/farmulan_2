@@ -4,7 +4,6 @@ import 'package:farmulan/farm/farm_tabs.dart';
 import 'package:farmulan/farm/plants.dart';
 import 'package:farmulan/utils/constants/images.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../utils/constants/colors.dart';
 
@@ -64,22 +63,20 @@ class TopContainer extends StatelessWidget {
                 const SizedBox(height: 2),
                 Text(
                   "Charlie's Farm",
-                  style: GoogleFonts.zenKakuGothicAntique(
-                    textStyle: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.white,
-                    ),
+                  style: TextStyle(
+                    fontFamily: 'Zen Kaku Gothic Antique',
+                    fontSize: 20,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.white,
                   ),
                 ),
                 Text(
                   "ID: 1344295024",
-                  style: GoogleFonts.zenKakuGothicAntique(
-                    textStyle: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.mainBg,
-                    ),
+                  style: TextStyle(
+                    fontFamily: 'Zen Kaku Gothic Antique',
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.mainBg,
                   ),
                 ),
               ],
@@ -259,22 +256,19 @@ class FarmHeroSection extends StatelessWidget {
           const SizedBox(height: 2),
           Text(
             "Charlie's Farm",
-            style: GoogleFonts.zenKakuGothicAntique(
-              textStyle: const TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.w700,
-                color: AppColors.primary,
-              ),
+            style: TextStyle(
+              fontFamily: 'Zen Kaku Gothic Antique',
+              fontSize: 20,
+              fontWeight: FontWeight.w700,
+              color: AppColors.primary,
             ),
           ),
           Text(
             "ID: 1344295024",
-            style: GoogleFonts.zenKakuGothicAntique(
-              textStyle: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.bold,
-                color: AppColors.regularText.withValues(alpha: 0.5),
-              ),
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+              color: AppColors.regularText.withValues(alpha: 0.5),
             ),
           ),
         ],

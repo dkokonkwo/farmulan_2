@@ -3,7 +3,6 @@ import 'package:farmulan/farm/plant_container.dart';
 import 'package:farmulan/utils/constants/glass_box.dart';
 import 'package:farmulan/utils/constants/icons.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../utils/constants/colors.dart';
 
@@ -70,12 +69,11 @@ void showMyBottomSheet(
                   SizedBox(width: 60),
                   Text(
                     plantName,
-                    style: GoogleFonts.zenKakuGothicAntique(
-                      textStyle: const TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.mainBg,
-                      ),
+                    style: const TextStyle(
+                      fontFamily: 'Zen Kaku Gothic Antique',
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.mainBg,
                     ),
                   ),
                 ],

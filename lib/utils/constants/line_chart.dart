@@ -184,6 +184,7 @@ class _LineChartSample12State extends State<LineChartSample12> {
                         return LineTooltipItem(
                           '',
                           const TextStyle(
+                            fontFamily: 'Zen Kaku Gothic Antique',
                             color: AppColors.contentColorBlack,
                             fontWeight: FontWeight.bold,
                           ),
@@ -199,6 +200,7 @@ class _LineChartSample12State extends State<LineChartSample12> {
                             TextSpan(
                               text: 'test',
                               style: const TextStyle(
+                                fontFamily: 'Zen Kaku Gothic Antique',
                                 color: AppColors.contentColorYellow,
                                 fontWeight: FontWeight.bold,
                                 fontSize: 16,
@@ -243,6 +245,7 @@ class _LineChartSample12State extends State<LineChartSample12> {
                             child: Text(
                               '${date.month}/${date.day}',
                               style: const TextStyle(
+                                fontFamily: 'Zen Kaku Gothic Antique',
                                 color: AppColors.contentColorGreen,
                                 fontSize: 12,
                                 fontWeight: FontWeight.bold,

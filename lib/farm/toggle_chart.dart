@@ -3,7 +3,6 @@ import 'package:farmulan/farm/plant_data.dart';
 import 'package:farmulan/utils/constants/bar_chart.dart';
 import 'package:flutter/material.dart' hide BoxDecoration, BoxShadow;
 import 'package:flutter_inset_box_shadow/flutter_inset_box_shadow.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../utils/constants/colors.dart';
 
@@ -121,8 +120,7 @@ class _ToggleChartState extends State<ToggleChart> {
                       ),
                       child: Text(
                         value,
-                        style: GoogleFonts.zenKakuGothicAntique(
-                          textStyle: TextStyle(
+                        style:  TextStyle(
                             fontSize: 15,
                             fontWeight: isSelected
                                 ? FontWeight.bold
@@ -131,7 +129,6 @@ class _ToggleChartState extends State<ToggleChart> {
                           ),
                         ),
                       ),
-                    ),
                   );
                 }).toList(),
               ),

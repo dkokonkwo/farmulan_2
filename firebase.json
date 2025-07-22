@@ -13,7 +13,17 @@
       "predeploy": [
         "npm --prefix \"$RESOURCE_DIR\" run lint",
         "npm --prefix \"$RESOURCE_DIR\" run build"
-      ]
+      ],
+      "gen": "2",
+      "runtime": "nodejs20",
+      "region": "us-central1",
+      "function": {
+        "fetchWeather": {
+          "environmentVariables": {
+            "OPENWEATHER_KEY": "13732c0a24msh0666500c322e5e7p15aebcjsnad58355b049c"
+          }
+        }
+      }
     }
   ]
 }

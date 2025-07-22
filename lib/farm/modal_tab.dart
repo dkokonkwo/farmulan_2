@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart' hide BoxDecoration, BoxShadow;
 import 'package:flutter_inset_box_shadow/flutter_inset_box_shadow.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../utils/constants/colors.dart';
 
@@ -44,16 +43,12 @@ class _ModalTabState extends State<ModalTab> {
       child: Center(
         child: Text(
           widget.title,
-          style: GoogleFonts.zenKakuGothicAntique(
-            textStyle: TextStyle(
-              fontSize: 16,
-              fontWeight: widget.isSelected
-                  ? FontWeight.bold
-                  : FontWeight.normal,
-              color: widget.isSelected
-                  ? AppColors.white
-                  : AppColors.white.withValues(alpha: 0.8),
-            ),
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: widget.isSelected ? FontWeight.bold : FontWeight.normal,
+            color: widget.isSelected
+                ? AppColors.white
+                : AppColors.white.withValues(alpha: 0.8),
           ),
         ),
       ),

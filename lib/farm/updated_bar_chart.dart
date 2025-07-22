@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../utils/constants/colors.dart'; // Assuming this path is correct
 
@@ -181,12 +180,11 @@ class _BarChartState extends State<_BarChart> {
             return BarTooltipItem(
               // Format for tooltip: Value \n HH:MM
               '${rod.toY.round()}',
-              GoogleFonts.zenKakuGothicAntique(
-                textStyle: const TextStyle(
+               TextStyle(
+                  fontFamily: 'Zen Kaku Gothic Antique',
                   fontWeight: FontWeight.bold,
                   color: AppColors.primaryRed,
                 ),
-              ),
             );
           },
     ),
@@ -194,12 +192,10 @@ class _BarChartState extends State<_BarChart> {
 
   // --- X-Axis Titles (Dynamic Visibility) ---
   Widget getTitles(double value, TitleMeta meta) {
-    final style = GoogleFonts.zenKakuGothicAntique(
-      textStyle: TextStyle(
+    final style =  TextStyle(
         fontSize: 13,
         fontWeight: FontWeight.bold,
         color: AppColors.primaryPurple,
-      ),
     );
 
     // Safety checks for sensorValues and index bounds

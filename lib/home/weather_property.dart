@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../utils/constants/colors.dart';
 
@@ -35,27 +34,24 @@ class _WeatherPropState extends State<WeatherProp> {
               const SizedBox(width: 5),
               Text(
                 widget.value,
-                style: GoogleFonts.zenKakuGothicAntique(
-                  textStyle: const TextStyle(
+                style: const TextStyle(
+                    fontFamily: 'Zen Kaku Gothic Antique',
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
                     color: AppColors.white,
                   ),
                 ),
-              ),
             ],
           ),
 
           Text(
             widget.title,
-            style: GoogleFonts.zenKakuGothicAntique(
-              textStyle: TextStyle(
+            style:  TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.normal,
                 color: AppColors.mainBg.withValues(alpha: 0.6),
               ),
             ),
-          ),
         ],
       ),
     );

@@ -1,8 +1,6 @@
 import 'package:csc_picker/csc_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:toastification/toastification.dart';
-
 import '../utils/constants/colors.dart';
 import '../utils/constants/icons.dart';
 
@@ -44,26 +42,20 @@ class _LocationPickerState extends State<LocationPicker> {
         spacing: 10,
         children: [
           CSCPicker(
-            selectedItemStyle: GoogleFonts.zenKakuGothicAntique(
-              textStyle: TextStyle(
+            selectedItemStyle:  TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w500,
                 color: AppColors.regularText.withValues(alpha: 0.7),
-              ),
             ),
-            dropdownHeadingStyle: GoogleFonts.zenKakuGothicAntique(
-              textStyle: TextStyle(
+            dropdownHeadingStyle:  TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
                 color: AppColors.regularText,
-              ),
             ),
-            dropdownItemStyle: GoogleFonts.zenKakuGothicAntique(
-              textStyle: TextStyle(
+            dropdownItemStyle:  TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w500,
                 color: AppColors.regularText.withValues(alpha: 0.9),
-              ),
             ),
             layout: Layout.vertical,
             flagState: CountryFlag.ENABLE,
@@ -90,13 +82,11 @@ class _LocationPickerState extends State<LocationPicker> {
                 children: [
                   Text(
                     'Update location',
-                    style: GoogleFonts.zenKakuGothicAntique(
-                      textStyle: TextStyle(
+                    style:  TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
                         color: AppColors.pageBackground,
                       ),
-                    ),
                   ),
                   Icon(
                     AppIcons.update,
