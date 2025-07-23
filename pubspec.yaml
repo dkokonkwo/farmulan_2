@@ -89,6 +89,9 @@ dependencies:
   # country_state_city picker
   csc_picker:
 
+  # shimmer: skeleton loader
+  shimmer:
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

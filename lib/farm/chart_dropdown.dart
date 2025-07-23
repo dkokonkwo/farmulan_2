@@ -74,6 +74,7 @@ class _ChartDropdownState extends State<ChartDropdown> {
             child: Text(
               titleList[index],
               style: TextStyle(
+                fontFamily: 'Zen Kaku Gothic Antique',
                 fontSize: 15,
                 fontWeight: FontWeight.normal,
                 color: AppColors.regularText.withValues(alpha: 0.6),

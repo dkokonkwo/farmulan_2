@@ -1,11 +1,17 @@
+import 'dart:typed_data';
 import 'dart:ui';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:farmulan/farm/farm_tabs.dart';
 import 'package:farmulan/farm/plants.dart';
 import 'package:farmulan/utils/constants/images.dart';
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
+import 'package:http/http.dart' as http;
 
+import '../authentication/auth.dart';
 import '../utils/constants/colors.dart';
+import '../utils/constants/toasts.dart';
 
 class TopContainer extends StatelessWidget {
   const TopContainer({super.key});
@@ -218,8 +224,87 @@ class TabTitleClipper extends CustomClipper<Path> {
   bool shouldReclip(CustomClipper<Path> oldClipper) => true;
 }
 
-class FarmHeroSection extends StatelessWidget {
+class FarmHeroSection extends StatefulWidget {
   const FarmHeroSection({super.key});
+
+  @override
+  State<FarmHeroSection> createState() => _FarmHeroSectionState();
+}
+
+class _FarmHeroSectionState extends State<FarmHeroSection> {
+  String firstName = '';
+  String farmId = '';
+  String farmImage = '';
+  Uint8List? bytes;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserDetails();
+  }
+
+  Future<void> _loadUserDetails() async {
+    final myBox = Hive.box('farmulanDB');
+    firstName = myBox.get('firstName') as String? ?? '';
+    farmId = myBox.get('farmId') as String? ?? '';
+    bytes = myBox.get('farmImageBytes') as Uint8List?;
+
+    if (bytes != null || farmId.isEmpty) {
+      if (mounted) setState(() {});
+      if (farmId.isEmpty) {
+        showInfoToast(context, 'Start your farm setup by adding your location');
+      }
+      return;
+    }
+
+    // no image stored locally check database
+    final user = Auth().currentUser;
+    if (user == null) {
+      showErrorToast(context, 'User not signed in');
+      return;
+    }
+
+    try {
+      final farmRef = FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .collection('farms')
+          .doc(farmId);
+
+      final snapshot = await farmRef.get();
+      final data = snapshot.data() ?? {};
+
+      // pull image from firestore
+      final imageUrl = (data['farmImage'] as String?) ?? '';
+      if (imageUrl.isEmpty) {
+        return;
+      }
+
+      // download image bytes
+      final response = await http.get(Uri.parse(imageUrl));
+      if (response.statusCode != 200) {
+        if (!mounted) return;
+        showErrorToast(
+          context,
+          'Failed to download image: ${response.statusCode}',
+        );
+        // throw Exception('Failed to download image: ${response.statusCode}');
+        return;
+      }
+
+      final imageBytes = response.bodyBytes;
+      await myBox.put('farmImageBytes', imageBytes);
+
+      if (!mounted) return;
+      setState(() {
+        farmImage = imageUrl; // store to a field
+        bytes = imageBytes;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      showErrorToast(context, 'Failed to fetch farm Image: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -248,14 +333,18 @@ class FarmHeroSection extends StatelessWidget {
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10),
               image: DecorationImage(
-                image: AssetImage(AppImages.farmImg),
+                image: bytes != null
+                    ? MemoryImage(bytes!)
+                    : farmImage.isNotEmpty
+                    ? NetworkImage(farmImage)
+                    : AssetImage(AppImages.farmImg),
                 fit: BoxFit.cover,
               ),
             ),
           ),
           const SizedBox(height: 2),
           Text(
-            "Charlie's Farm",
+            "$firstName's Farm",
             style: TextStyle(
               fontFamily: 'Zen Kaku Gothic Antique',
               fontSize: 20,
@@ -264,8 +353,9 @@ class FarmHeroSection extends StatelessWidget {
             ),
           ),
           Text(
-            "ID: 1344295024",
+            "ID: $farmId",
             style: TextStyle(
+              fontFamily: 'Zen Kaku Gothic Antique',
               fontSize: 14,
               fontWeight: FontWeight.bold,
               color: AppColors.regularText.withValues(alpha: 0.5),

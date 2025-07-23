@@ -1,12 +1,13 @@
+import 'package:farmulan/farm/plants.dart';
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 
 import '../utils/constants/colors.dart';
 import '../utils/constants/icons.dart';
 
 class PlantItem extends StatefulWidget {
-  final List<String> plantInfo;
-  final String imgUrl;
-  const PlantItem({super.key, required this.plantInfo, required this.imgUrl});
+  final PlantInfo plantInfo;
+  const PlantItem({super.key, required this.plantInfo});
 
   @override
   State<PlantItem> createState() => _PlantItemState();
@@ -41,15 +42,12 @@ class _PlantItemState extends State<PlantItem> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            Container(
+            SizedBox(
               width: width / 1.8,
               height: width / 1.8,
-              decoration: BoxDecoration(
-                image: DecorationImage(
-                  image: AssetImage(widget.imgUrl),
-                  fit: BoxFit.cover,
-                ),
-              ),
+              child: widget.plantInfo.isGrowing
+                  ? Lottie.asset('assets/animations/growing.json')
+                  : Lottie.asset('assets/animations/notGrowing.json'),
             ),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -67,8 +65,9 @@ class _PlantItemState extends State<PlantItem> {
                     ),
                     SizedBox(width: 5),
                     Text(
-                      widget.plantInfo[3],
+                      widget.plantInfo.isGrowing ? 'Growing' : 'Not Growing',
                       style: TextStyle(
+                        fontFamily: 'Zen Kaku Gothic Antique',
                         fontSize: 15,
                         fontWeight: FontWeight.normal,
                         color: AppColors.regularText.withValues(alpha: 0.5),
@@ -77,16 +76,20 @@ class _PlantItemState extends State<PlantItem> {
                   ],
                 ),
                 Text(
-                  widget.plantInfo[0],
+                  widget.plantInfo.name,
                   style: TextStyle(
+                    fontFamily: 'Zen Kaku Gothic Antique',
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                     color: AppColors.regularText.withValues(alpha: 0.7),
                   ),
                 ),
                 Text(
-                  "Planted ${widget.plantInfo[1]} days ago",
+                  widget.plantInfo.isGrowing
+                      ? "Planted ${widget.plantInfo.timeOfPlant} days ago"
+                      : "Not planted",
                   style: TextStyle(
+                    fontFamily: 'Zen Kaku Gothic Antique',
                     fontSize: 13,
                     color: AppColors.regularText.withValues(alpha: 0.5),
                     fontWeight: FontWeight.bold,

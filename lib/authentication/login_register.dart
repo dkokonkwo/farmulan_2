@@ -6,6 +6,7 @@ import 'package:farmulan/utils/constants/toasts.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:hive/hive.dart';
 import 'package:lottie/lottie.dart';
 
 import '../utils/constants/colors.dart';
@@ -234,6 +235,11 @@ class _SignUpPageState extends State<SignUpPage> {
 
       if (!mounted) return;
       showSuccessToast(context, 'Registration successful');
+
+      final myBox = Hive.box('farmulanDB');
+      await myBox.put('firstName', firstNameController.text.trim());
+      await myBox.put('LastName', lastNameController.text.trim());
+
       Get.to(() => MyNavBar());
     } on FirebaseAuthException catch (e) {
       if (!mounted) return;

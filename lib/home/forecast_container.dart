@@ -57,7 +57,7 @@ class _WeatherAPIDataState extends State<WeatherAPIData> {
   @override
   void initState() {
     super.initState();
-    _fetchWeather();
+    // _fetchWeather();
   }
 
   Future<void> _setCityAndCountry(String city, String country) async {
@@ -239,12 +239,12 @@ class _WeatherAPIDataState extends State<WeatherAPIData> {
                   SizedBox(width: 10),
                   Text(
                     description,
-                    style:  TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.mainBg.withValues(alpha: 0.7),
-                      ),
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.mainBg.withValues(alpha: 0.7),
                     ),
+                  ),
                 ],
               ),
               Text(
@@ -289,12 +289,12 @@ class _GPSLocatorState extends State<GPSLocator> {
               'Please wait, fetching Location...',
               textAlign: TextAlign.center,
               style: const TextStyle(
-                  fontFamily: 'Zen Kaku Gothic Antique',
-                  fontSize: 20,
-                  fontWeight: FontWeight.w900,
-                  color: AppColors.primaryRed,
-                ),
+                fontFamily: 'Zen Kaku Gothic Antique',
+                fontSize: 20,
+                fontWeight: FontWeight.w900,
+                color: AppColors.primaryRed,
               ),
+            ),
           ],
         ),
       ),

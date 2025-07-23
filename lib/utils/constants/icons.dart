@@ -41,4 +41,6 @@ class AppIcons {
 
   static IconData sms = Iconsax.sms;
   static IconData eyeSlash = Iconsax.eye_slash;
+
+  static IconData plus = FontAwesomeIcons.plus;
 }

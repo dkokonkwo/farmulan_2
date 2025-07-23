@@ -55,7 +55,7 @@ void showInfoToast(BuildContext context, String message) {
       style: TextStyle(
         fontSize: 16,
         fontWeight: FontWeight.normal,
-        color: AppColors.pageBackground,
+        color: AppColors.primaryRed,
       ),
     ),
     autoCloseDuration: const Duration(seconds: 3),

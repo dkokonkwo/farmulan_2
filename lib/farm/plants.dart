@@ -1,14 +1,19 @@
 import 'dart:ui';
 
-import 'package:farmulan/farm/plant_data.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:farmulan/farm/plant_details.dart';
 import 'package:farmulan/farm/plant_item.dart';
+import 'package:farmulan/utils/constants/add_buttons.dart';
 import 'package:farmulan/utils/constants/colors.dart';
 import 'package:farmulan/utils/constants/icons.dart';
-import 'package:farmulan/utils/constants/images.dart';
+import 'package:farmulan/utils/constants/skeletons.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:hive_flutter/adapters.dart';
+import 'package:lottie/lottie.dart';
 
+import '../authentication/auth.dart';
+import '../utils/constants/toasts.dart';
 
 class PlantContainerClipper extends CustomClipper<Path> {
   @override
@@ -103,12 +108,7 @@ class _CustomPlantContainerState extends State<CustomPlantContainer> {
                   Container(
                     width: width / 1.8,
                     height: width / 1.8,
-                    decoration: BoxDecoration(
-                      image: DecorationImage(
-                        image: AssetImage(widget.imgUrl),
-                        fit: BoxFit.cover,
-                      ),
-                    ),
+                    child: Lottie.asset('assets/animations/growing.json'),
                   ),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -119,31 +119,33 @@ class _CustomPlantContainerState extends State<CustomPlantContainer> {
                           SizedBox(width: 5),
                           Text(
                             widget.isGrowing ? "Growing" : "Not planted",
-                            style:  TextStyle(
-                                fontSize: 15,
-                                fontWeight: FontWeight.normal,
-                                color: AppColors.mainBg,
-                              ),
+                            style: TextStyle(
+                              fontFamily: 'Zen Kaku Gothic Antique',
+                              fontSize: 15,
+                              fontWeight: FontWeight.normal,
+                              color: AppColors.mainBg,
                             ),
-
+                          ),
                         ],
                       ),
                       Text(
                         widget.name,
-                        style:  TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.white,
-                          ),
+                        style: TextStyle(
+                          fontFamily: 'Zen Kaku Gothic Antique',
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.white,
                         ),
+                      ),
                       Text(
                         "Planted ${widget.timeOfPlant} days ago",
-                        style:  TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.normal,
-                            color: AppColors.mainBg,
-                          ),
+                        style: TextStyle(
+                          fontFamily: 'Zen Kaku Gothic Antique',
+                          fontSize: 14,
+                          fontWeight: FontWeight.normal,
+                          color: AppColors.mainBg,
                         ),
+                      ),
                     ],
                   ),
                 ],
@@ -166,11 +168,22 @@ class PlantsTab extends StatefulWidget {
 class _PlantsTabState extends State<PlantsTab>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  List<PlantInfo> crops = [];
+  final myBox = Hive.box('farmulanDB');
+  bool _isLoadingInitialData = true;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+    _loadCrops().then((_) {
+      // Once _loadCrops completes (successfully or with error), set loading to false
+      if (mounted) {
+        setState(() {
+          _isLoadingInitialData = false;
+        });
+      }
+    });
   }
 
   @override
@@ -179,65 +192,169 @@ class _PlantsTabState extends State<PlantsTab>
     super.dispose();
   }
 
+  Future<void> _loadCrops() async {
+    final farmId = myBox.get('farmId') as String? ?? '';
+
+    final user = Auth().currentUser;
+    if (user == null || farmId.isEmpty) {
+      showErrorToast(context, 'User not signed in or no farm selected');
+      return;
+    }
+
+    try {
+      final farmRef = FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .collection('farms')
+          .doc(farmId);
+
+      final snapshot = await farmRef.get();
+      final data = snapshot.data() ?? {};
+
+      final farmCrops = (data['crops'] as List<dynamic>? ?? [])
+          .cast<Map<String, dynamic>>();
+      setState(() {
+        crops = List<PlantInfo>.generate(farmCrops.length, (i) {
+          final m = farmCrops[i];
+          //Try to get a Timestamp, else null
+          final Timestamp? ts = m['timePlanted'] as Timestamp?;
+          final DateTime plantedDate = ts?.toDate() ?? DateTime.now();
+          final daysSince = DateTime.now().difference(plantedDate).inDays;
+          return PlantInfo(
+            farmCrops[i]['name'] as String,
+            farmCrops[i]['isGrowing'] as bool,
+            daysSince,
+            farmCrops[i]['growthStage'] as int,
+          );
+        });
+      });
+    } catch (e) {
+      if (!mounted) return;
+      showErrorToast(context, 'Failed to fetch farm data: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width / 1.11;
     double height = MediaQuery.of(context).size.width / 1.4;
 
-    List<PlantInfo> addedPlants = [
-      PlantInfo("Tomatoes", true, AppImages.tomatoes, 8),
-      PlantInfo("Lettuce", true, AppImages.lettuce, 8),
-    ];
+    if (_isLoadingInitialData) {
+      return Column(
+        children: [
+          SizedBox(
+            height: height,
+            width: width,
+            child: Stack(
+              children: [
+                // Left crop
+                Positioned(top: 25, left: 0, child: PlantBoxSkeleton()),
+                Positioned(top: 0, right: 0, child: PlantBoxSkeleton()),
+              ],
+            ),
+          ),
+        ],
+      );
+      // Or: CircularProgressIndicator() while you’re loading for the first time
+    }
 
-    final double crops = 2.0;
-    final numOfBoxes = (crops / 2).ceil();
+    return ValueListenableBuilder<Box<dynamic>>(
+      valueListenable: myBox.listenable(keys: ['crops']),
+      builder: (context, Box b, _) {
+        // safely read & convert to raw list
+        final rawDynamic = b.get('crops') as List<dynamic>? ?? [];
+        final farmCrops = rawDynamic
+            .map((e) => Map<String, dynamic>.from(e as Map))
+            .toList();
 
-    return Column(
-      children: List.generate(numOfBoxes, (index) {
-        return SizedBox(
-          height: height,
-          width: width,
-          child: Stack(
+        if (farmCrops.isEmpty) {
+          return Column(
             children: [
-              Positioned(
-                top: 25,
-                left: 0,
-                child: GestureDetector(
-                  onTap: () {
-                    Get.to(PlantDetails(index: index * 2));
-                  },
-                  child: PlantItem(
-                    plantInfo: plantAppBarData[index * 2],
-                    imgUrl: addedPlants[index * 2].imgUrl,
-                  ),
-                ),
-              ),
-              Positioned(
-                top: 0,
-                right: 0,
-                child: GestureDetector(
-                  onTap: () {
-                    Get.to(PlantDetails(index: (index * 2) + 1));
-                  },
-                  child: PlantItem(
-                    plantInfo: plantAppBarData[(index * 2) + 1],
-                    imgUrl: addedPlants[(index * 2) + 1].imgUrl,
-                  ),
+              SizedBox(
+                height: height,
+                width: width,
+                child: Stack(
+                  children: [
+                    // Left crop
+                    Positioned(top: 25, left: 0, child: PlantBoxSkeleton()),
+                    Positioned(top: 0, right: 0, child: PlantBoxSkeleton()),
+                    AddCropButton(),
+                  ],
                 ),
               ),
             ],
-          ),
+          );
+        }
+
+        // Map into PlantInfo models
+        final freshCrops = List<PlantInfo>.generate(farmCrops.length, (i) {
+          final m = farmCrops[i];
+          final rawPlanted = m['timePlanted'];
+          DateTime plantedDate;
+          if (rawPlanted is Timestamp) {
+            plantedDate = rawPlanted.toDate();
+          } else if (rawPlanted is DateTime) {
+            plantedDate = rawPlanted;
+          } else {
+            plantedDate = DateTime.now();
+          }
+          final daysSince = DateTime.now().difference(plantedDate).inDays;
+          return PlantInfo(
+            m['name'] as String,
+            m['isGrowing'] as bool,
+            daysSince,
+            m['growthStage'] as int,
+          );
+        });
+
+        // Build grid using freshCrops…
+        final cropCount = freshCrops.length;
+        final numRows = (cropCount / 2).ceil();
+
+        return Column(
+          children: [
+            for (var row = 0; row < numRows; row++)
+              SizedBox(
+                height: height,
+                width: width,
+                child: Stack(
+                  children: [
+                    // Left crop
+                    Positioned(
+                      top: 25,
+                      left: 0,
+                      child: GestureDetector(
+                        onTap: () => Get.to(PlantDetails(index: row * 2)),
+                        child: PlantItem(plantInfo: crops[row * 2]),
+                      ),
+                    ),
+                    // Right crop (only if exists)
+                    if ((row * 2 + 1) < cropCount)
+                      Positioned(
+                        top: 0,
+                        right: 0,
+                        child: GestureDetector(
+                          onTap: () => Get.to(PlantDetails(index: row * 2 + 1)),
+                          child: PlantItem(plantInfo: crops[row * 2 + 1]),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            // Always show option to add button
+            AddCropButton(),
+          ],
         );
-      }),
+      },
     );
   }
 }
 
 class PlantInfo {
-  PlantInfo(this.name, this.isGrowing, this.imgUrl, this.timeOfPlant);
+  PlantInfo(this.name, this.isGrowing, this.timeOfPlant, this.plantStage);
 
   String name;
   bool isGrowing;
-  String imgUrl;
   int timeOfPlant;
+  int plantStage;
 }

@@ -1,9 +1,15 @@
+import 'dart:typed_data';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:farmulan/utils/constants/icons.dart';
 import 'package:farmulan/utils/constants/images.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
+import 'package:http/http.dart' as http;
 
+import '../authentication/auth.dart';
 import '../utils/constants/colors.dart';
+import '../utils/constants/toasts.dart';
 
 class HomeBanner extends StatefulWidget {
   const HomeBanner({super.key});
@@ -14,14 +20,15 @@ class HomeBanner extends StatefulWidget {
 
 class _HomeBannerState extends State<HomeBanner> {
   String _farmId = '';
+  String farmImage = '';
 
   @override
   void initState() {
     super.initState();
-    _getFarmId();
+    _getFarmDetails();
   }
 
-  Future<void> _getFarmId() async {
+  Future<void> _getFarmDetails() async {
     final box = Hive.box('farmulanDB');
     final stored = box.get('farmId');
     if (stored is String && stored.isNotEmpty) {
@@ -33,6 +40,56 @@ class _HomeBannerState extends State<HomeBanner> {
       setState(() {
         _farmId = '______';
       });
+      if (!mounted) return;
+      showInfoToast(context, 'Start your farm setup by adding your location');
+      return;
+    }
+
+    final user = Auth().currentUser;
+    if (user == null) {
+      showErrorToast(context, 'User not signed in');
+      return;
+    }
+
+    try {
+      final farmRef = FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .collection('farms')
+          .doc(_farmId);
+
+      final snapshot = await farmRef.get();
+      final data = snapshot.data() ?? {};
+
+      // pull image from firestore
+      final imageUrl = (data['farmImage'] as String?) ?? '';
+      if (imageUrl.isEmpty) {
+        return;
+      }
+
+      // download image bytes
+      final response = await http.get(Uri.parse(imageUrl));
+      if (response.statusCode != 200) {
+        if (!mounted) return;
+        showErrorToast(
+          context,
+          'Failed to download image: ${response.statusCode}',
+        );
+        // throw Exception('Failed to download image: ${response.statusCode}');
+      }
+
+      final bytes = response.bodyBytes;
+
+      // Store the raw bytes in Hive
+      await box.put('farmImageBytes', bytes);
+
+      if (!mounted) return;
+      setState(() {
+        farmImage = imageUrl; // store to a field if you want immediate use
+      });
+    } catch (e) {
+      if (!mounted) return;
+      showErrorToast(context, 'Failed to fetch farm Image: $e');
     }
   }
 
@@ -42,6 +99,8 @@ class _HomeBannerState extends State<HomeBanner> {
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width - 40;
     double height = MediaQuery.of(context).size.height / (844 / 200);
+    final box = Hive.box('farmulanDB');
+    final bytes = box.get('farmImageBytes') as Uint8List?;
     return Stack(
       clipBehavior: Clip.none,
       alignment: AlignmentDirectional.bottomCenter,
@@ -50,8 +109,12 @@ class _HomeBannerState extends State<HomeBanner> {
           height: height,
           width: width,
           decoration: BoxDecoration(
-            image: const DecorationImage(
-              image: AssetImage(AppImages.farmImg),
+            image: DecorationImage(
+              image: bytes != null
+                  ? MemoryImage(bytes)
+                  : farmImage.isNotEmpty
+                  ? NetworkImage(farmImage)
+                  : AssetImage(AppImages.farmImg),
               fit: BoxFit.cover,
             ),
             color: AppColors.mainBg,
@@ -84,23 +147,23 @@ class _HomeBannerState extends State<HomeBanner> {
                     children: [
                       Text(
                         "Charlie's Farm",
-                        style:  const TextStyle(
-                            fontFamily: 'Zen Kaku Gothic Antique',
-                            fontSize: 20,
-                            fontWeight: FontWeight.w700,
-                            color: AppColors.primary,
-                          ),
+                        style: const TextStyle(
+                          fontFamily: 'Zen Kaku Gothic Antique',
+                          fontSize: 20,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.primary,
                         ),
+                      ),
 
                       Text(
                         "ID: $_farmId",
-                        style:  const TextStyle(
-                            fontFamily: 'Zen Kaku Gothic Antique',
-                            fontSize: 15,
-                            fontWeight: FontWeight.normal,
-                            color: AppColors.secondary,
-                          ),
+                        style: const TextStyle(
+                          fontFamily: 'Zen Kaku Gothic Antique',
+                          fontSize: 15,
+                          fontWeight: FontWeight.normal,
+                          color: AppColors.secondary,
                         ),
+                      ),
                     ],
                   ),
                   const Spacer(),
