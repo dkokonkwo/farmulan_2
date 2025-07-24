@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:farmulan/farm/farm_tabs.dart';
 import 'package:farmulan/farm/plants.dart';
+import 'package:farmulan/farm/settings.dart';
 import 'package:farmulan/utils/constants/images.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
@@ -196,7 +197,7 @@ class _TabContainerState extends State<TabContainer> {
           width: width,
           child: IndexedStack(
             index: selectedIndex,
-            children: [PlantsTab(), Text('data 2'), Text('data 3')],
+            children: [PlantsTab(), Text('data 2'), SettingsTab()],
           ),
         ),
       ],

@@ -105,7 +105,7 @@ class _CustomPlantContainerState extends State<CustomPlantContainer> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  Container(
+                  SizedBox(
                     width: width / 1.8,
                     height: width / 1.8,
                     child: Lottie.asset('assets/animations/growing.json'),
@@ -324,7 +324,7 @@ class _PlantsTabState extends State<PlantsTab>
                       top: 25,
                       left: 0,
                       child: GestureDetector(
-                        onTap: () => Get.to(PlantDetails(index: row * 2)),
+                        onTap: () => Get.to(PlantDetails(data: crops[row * 2])),
                         child: PlantItem(plantInfo: crops[row * 2]),
                       ),
                     ),
@@ -334,7 +334,8 @@ class _PlantsTabState extends State<PlantsTab>
                         top: 0,
                         right: 0,
                         child: GestureDetector(
-                          onTap: () => Get.to(PlantDetails(index: row * 2 + 1)),
+                          onTap: () =>
+                              Get.to(PlantDetails(data: crops[row * 2 + 1])),
                           child: PlantItem(plantInfo: crops[row * 2 + 1]),
                         ),
                       ),

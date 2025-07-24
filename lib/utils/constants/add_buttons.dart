@@ -3,6 +3,7 @@ import 'package:farmulan/utils/constants/toasts.dart';
 import 'package:flutter/material.dart' hide BoxDecoration, BoxShadow;
 import 'package:flutter_inset_box_shadow/flutter_inset_box_shadow.dart';
 import 'package:hive/hive.dart';
+import 'package:uuid/uuid.dart';
 
 import '../../authentication/auth.dart';
 import '../../farm/plant_item.dart';
@@ -81,7 +82,11 @@ class _AddCropButtonState extends State<AddCropButton> {
           ? DateTime.now().subtract(Duration(days: timeSincePlanted!))
           : null;
 
+      final uuid = Uuid();
+      final cropId = uuid.v4();
+
       final newCrop = {
+        'cropId': cropId,
         'name': nameText,
         'isGrowing': isGrowing,
         'timePlanted': plantingDate,

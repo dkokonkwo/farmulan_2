@@ -43,4 +43,5 @@ class AppIcons {
   static IconData eyeSlash = Iconsax.eye_slash;
 
   static IconData plus = FontAwesomeIcons.plus;
+  static IconData editImg = Iconsax.gallery_add;
 }

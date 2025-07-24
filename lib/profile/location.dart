@@ -1,6 +1,7 @@
 import 'package:csc_picker/csc_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:toastification/toastification.dart';
+
 import '../utils/constants/colors.dart';
 import '../utils/constants/icons.dart';
 
@@ -26,8 +27,24 @@ class _LocationPickerState extends State<LocationPicker> {
       type: ToastificationType.success,
       // Change to error, warning, or info as needed
       style: ToastificationStyle.flat,
-      title: const Text('Successful!'),
-      description: Text('Farm location updated'),
+      title: const Text(
+        'Successful!',
+        style: TextStyle(
+          fontFamily: 'Zen Kaku Gothic Antique',
+          fontSize: 20,
+          fontWeight: FontWeight.bold,
+          color: AppColors.primaryPurple,
+        ),
+      ),
+      description: Text(
+        'Farm location updated',
+        style: TextStyle(
+          fontFamily: 'Zen Kaku Gothic Antique',
+          fontSize: 20,
+          fontWeight: FontWeight.bold,
+          color: AppColors.primaryPurple,
+        ),
+      ),
       autoCloseDuration: const Duration(seconds: 3),
       icon: const Icon(Icons.check_circle, color: Colors.white),
     );
@@ -42,20 +59,23 @@ class _LocationPickerState extends State<LocationPicker> {
         spacing: 10,
         children: [
           CSCPicker(
-            selectedItemStyle:  TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-                color: AppColors.regularText.withValues(alpha: 0.7),
+            selectedItemStyle: TextStyle(
+              fontFamily: 'Zen Kaku Gothic Antique',
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+              color: AppColors.regularText.withValues(alpha: 0.7),
             ),
-            dropdownHeadingStyle:  TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: AppColors.regularText,
+            dropdownHeadingStyle: TextStyle(
+              fontFamily: 'Zen Kaku Gothic Antique',
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: AppColors.regularText,
             ),
-            dropdownItemStyle:  TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-                color: AppColors.regularText.withValues(alpha: 0.9),
+            dropdownItemStyle: TextStyle(
+              fontFamily: 'Zen Kaku Gothic Antique',
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+              color: AppColors.regularText.withValues(alpha: 0.9),
             ),
             layout: Layout.vertical,
             flagState: CountryFlag.ENABLE,
@@ -82,11 +102,12 @@ class _LocationPickerState extends State<LocationPicker> {
                 children: [
                   Text(
                     'Update location',
-                    style:  TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.pageBackground,
-                      ),
+                    style: TextStyle(
+                      fontFamily: 'Zen Kaku Gothic Antique',
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.pageBackground,
+                    ),
                   ),
                   Icon(
                     AppIcons.update,

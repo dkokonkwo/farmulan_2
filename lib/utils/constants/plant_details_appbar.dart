@@ -1,10 +1,13 @@
+import 'package:farmulan/farm/plant_data.dart';
 import 'package:farmulan/utils/constants/colors.dart';
 import 'package:farmulan/utils/constants/icons.dart';
 import 'package:flutter/material.dart' hide BoxDecoration, BoxShadow;
 import 'package:flutter_inset_box_shadow/flutter_inset_box_shadow.dart';
 
+import '../../farm/plants.dart';
+
 class PlantDetailsAppBar extends StatefulWidget implements PreferredSizeWidget {
-  final List<String> plantInfo;
+  final PlantInfo plantInfo;
   const PlantDetailsAppBar({super.key, required this.plantInfo});
 
   @override
@@ -30,13 +33,13 @@ class _PlantDetailsAppBarState extends State<PlantDetailsAppBar> {
         ),
       ),
       title: Text(
-        widget.plantInfo[0],
-        style: 
-           TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: AppColors.pageHeadingText,
-          ),
+        widget.plantInfo.name,
+        style: TextStyle(
+          fontFamily: 'Zen Kaku Gothic Antique',
+          fontSize: 20,
+          fontWeight: FontWeight.bold,
+          color: AppColors.pageHeadingText,
+        ),
       ),
       actions: [
         NeumorphicButton(
@@ -106,7 +109,7 @@ class _NeumorphicButtonState extends State<NeumorphicButton> {
   }
 }
 
-void showInfoDialog(BuildContext context, List<String> plantInfo) {
+void showInfoDialog(BuildContext context, PlantInfo plantInfo) {
   showDialog<String>(
     context: context,
     builder: (BuildContext context) => AlertDialog(
@@ -116,13 +119,13 @@ void showInfoDialog(BuildContext context, List<String> plantInfo) {
         children: [
           Icon(AppIcons.leaf, color: AppColors.regularText),
           Text(
-            plantInfo[0],
-            style: 
-               TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: AppColors.regularText,
-              ),
+            plantInfo.name,
+            style: TextStyle(
+              fontFamily: 'Zen Kaku Gothic Antique',
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: AppColors.regularText,
+            ),
           ),
         ],
       ),
@@ -140,37 +143,38 @@ void showInfoDialog(BuildContext context, List<String> plantInfo) {
           SizedBox(width: 7),
           Text(
             'Growth Stage',
-            style: 
-               TextStyle(
-                fontSize: 15,
-                fontWeight: FontWeight.bold,
-                color: AppColors.regularText.withValues(alpha: 0.5),
-              ),
-
+            style: TextStyle(
+              fontFamily: 'Zen Kaku Gothic Antique',
+              fontSize: 15,
+              fontWeight: FontWeight.bold,
+              color: AppColors.regularText.withValues(alpha: 0.5),
+            ),
           ),
           SizedBox(width: 15),
           Text(
-            plantInfo[2],
-            style: 
-               TextStyle(
-                fontSize: 17,
-                fontWeight: FontWeight.bold,
-                color: AppColors.regularText.withValues(alpha: 0.7),
-                fontStyle: FontStyle.italic,
-              ),
+            growthStages[plantInfo.plantStage],
+            style: TextStyle(
+              fontFamily: 'Zen Kaku Gothic Antique',
+              fontSize: 17,
+              fontWeight: FontWeight.bold,
+              color: AppColors.regularText.withValues(alpha: 0.7),
+              fontStyle: FontStyle.italic,
             ),
+          ),
         ],
       ),
       actions: <Widget>[
         Text(
-          'Planted ${plantInfo[1]} days ago',
-          style: 
-             TextStyle(
-              fontSize: 15,
-              fontWeight: FontWeight.bold,
-              color: AppColors.regularText,
-              fontStyle: FontStyle.italic,
-            ),
+          plantInfo.isGrowing
+              ? 'Planted ${plantInfo.timeOfPlant} days ago'
+              : 'Not planted',
+          style: TextStyle(
+            fontFamily: 'Zen Kaku Gothic Antique',
+            fontSize: 15,
+            fontWeight: FontWeight.bold,
+            color: AppColors.regularText,
+            fontStyle: FontStyle.italic,
+          ),
         ),
       ],
     ),

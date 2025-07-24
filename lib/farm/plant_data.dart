@@ -9,7 +9,8 @@ final List<int> weeklySoilMoisture = [5, 5, 18, 6, 13, 10, 0];
 final List<int> weeklyHumidity = [8, 10, 14, 15, 13, 10, 16];
 
 // stages of growth
-final List<String> plantStages = [
+final List<String> growthStages = [
+  'Not Growing',
   'Germination',
   'Seedling',
   'Vegetative',
@@ -18,10 +19,10 @@ final List<String> plantStages = [
 ];
 
 final List<List<String>> plantAppBarData = [
-  ['Tomatoes', '8', plantStages[2], 'Growing'],
-  ['Lettuce', '10', plantStages[3], 'Growing'],
-  ['Maize', '8', plantStages[4], 'Growing'],
-  ['Cassava', '2', plantStages[1], 'Growing'],
+  ['Tomatoes', '8', growthStages[2], 'Growing'],
+  ['Lettuce', '10', growthStages[3], 'Growing'],
+  ['Maize', '8', growthStages[4], 'Growing'],
+  ['Cassava', '2', growthStages[1], 'Growing'],
 ];
 
 final List<List<IconData>> sensorIcons = [

@@ -82,9 +82,9 @@ class _BarChartState extends State<_BarChart> {
             value = double.tryParse(rawValue.toString()) ?? 0.0;
             if (value == 0.0 && rawValue != 0 && rawValue != 0.0) {
               // Log a warning if parsing failed and the original value wasn't 0
-              print(
-                'Warning: Failed to parse value: $rawValue (${rawValue.runtimeType}) to double, defaulting to 0.0',
-              );
+              // print(
+              //   'Warning: Failed to parse value: $rawValue (${rawValue.runtimeType}) to double, defaulting to 0.0',
+              // );
             }
           }
           return (dateTime, value);
@@ -180,11 +180,11 @@ class _BarChartState extends State<_BarChart> {
             return BarTooltipItem(
               // Format for tooltip: Value \n HH:MM
               '${rod.toY.round()}',
-               TextStyle(
-                  fontFamily: 'Zen Kaku Gothic Antique',
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.primaryRed,
-                ),
+              TextStyle(
+                fontFamily: 'Zen Kaku Gothic Antique',
+                fontWeight: FontWeight.bold,
+                color: AppColors.primaryRed,
+              ),
             );
           },
     ),
@@ -192,10 +192,10 @@ class _BarChartState extends State<_BarChart> {
 
   // --- X-Axis Titles (Dynamic Visibility) ---
   Widget getTitles(double value, TitleMeta meta) {
-    final style =  TextStyle(
-        fontSize: 13,
-        fontWeight: FontWeight.bold,
-        color: AppColors.primaryPurple,
+    final style = TextStyle(
+      fontSize: 13,
+      fontWeight: FontWeight.bold,
+      color: AppColors.primaryPurple,
     );
 
     // Safety checks for sensorValues and index bounds
