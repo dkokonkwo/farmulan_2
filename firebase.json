@@ -15,7 +15,7 @@
         "npm --prefix \"$RESOURCE_DIR\" run build"
       ],
       "gen": "2",
-      "runtime": "nodejs20",
+      "runtime": "nodejs22",
       "region": "us-central1",
       "function": {
         "fetchWeather": {

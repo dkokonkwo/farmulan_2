@@ -60,7 +60,7 @@ class _AddCropButtonState extends State<AddCropButton> {
       }
     }
 
-    setState(() => isUpdating = true);
+    if (mounted) setState(() => isUpdating = true);
 
     try {
       final box = Hive.box('farmulanDB');
@@ -68,14 +68,9 @@ class _AddCropButtonState extends State<AddCropButton> {
       final user = Auth().currentUser;
 
       if (farmId == null || user == null) {
-        throw Exception('No farm selected or user not signed in');
+        showErrorToast(context, 'No farm selected or user not signed in');
+        return;
       }
-
-      final farmDoc = FirebaseFirestore.instance
-          .collection('users')
-          .doc(user.uid)
-          .collection('farms')
-          .doc(farmId);
 
       // Prepare crop map
       final plantingDate = isGrowing
@@ -89,27 +84,47 @@ class _AddCropButtonState extends State<AddCropButton> {
         'cropId': cropId,
         'name': nameText,
         'isGrowing': isGrowing,
-        'timePlanted': plantingDate,
-        'growthStage': isGrowing ? 1 : 0, // initial stage is
+        'timePlanted': plantingDate, // Stored as DateTime in Firestore
+        'growthStage': isGrowing ? 1 : 0,
       };
 
-      // adding to the array and increment the counter
-      await farmDoc.update({
-        'crops': FieldValue.arrayUnion([newCrop]),
-        'numOfCrops': FieldValue.increment(1),
-      });
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .collection('farms')
+          .doc(farmId)
+          .collection('crops')
+          .doc(cropId)
+          .set(newCrop);
+
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .collection('farms')
+          .doc(farmId)
+          .update({'numOfCrops': FieldValue.increment(1)});
+
+      final newCropHive = {
+        'cropId': cropId,
+        'name': nameText,
+        'isGrowing': isGrowing,
+        'timePlanted': plantingDate?.millisecondsSinceEpoch,
+        'growthStage': isGrowing ? 1 : 0, // initial stage is
+      };
 
       // mirroring in Hive
       // (re‑fetch fresh data normally)
       final currentList = box.get('crops', defaultValue: []) as List;
-      await box.put('crops', [...currentList, newCrop]);
+      await box.put('crops', [...currentList, newCropHive]);
       await box.put('numOfCrops', (box.get('numOfCrops') as int? ?? 0) + 1);
 
       // Close the dialog
-      if (mounted) Navigator.of(context, rootNavigator: true).pop();
-      if (!mounted) return;
-      showSuccessToast(context, 'Crop added successfully!');
+      if (mounted) {
+        Navigator.of(context, rootNavigator: true).pop();
+        showSuccessToast(context, 'Crop added successfully!');
+      }
     } catch (e) {
+      if (!mounted) return;
       showErrorToast(context, 'Failed to add crop: $e');
     } finally {
       if (mounted) setState(() => isUpdating = false);

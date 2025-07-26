@@ -36,38 +36,7 @@ class _CropBottomSheetState extends State<CropBottomSheet> {
   @override
   void initState() {
     super.initState();
-    cropNameCtrl = TextEditingController(
-      text: widget.plantInfo['name'] as String?,
-    );
-    final bool? isGrowing = widget.plantInfo['isGrowing'] as bool?;
-    dropdownValue = (isGrowing == true) ? 'Yes' : 'No';
-    // _originalTimePlanted = widget.plantInfo['timePlanted'] as Timestamp?;
-    if (isGrowing!) {
-      final raw = widget.plantInfo['timePlanted'];
-      DateTime plantedDate;
-      if (raw is DateTime) {
-        plantedDate = raw;
-      } else if (raw is Timestamp) {
-        // in case some entries are still Timestamps
-        plantedDate = raw.toDate();
-      } else {
-        // no date stored → treat as 0 days
-        plantedDate = DateTime.now();
-      }
-
-      final daysSince = DateTime.now().difference(plantedDate).inDays;
-      plantedTimeCtrl = TextEditingController(text: daysSince.toString());
-    } else {
-      plantedTimeCtrl = TextEditingController(text: '');
-    }
-
-    // final days = _originalTimePlanted == null
-    //     ? ''
-    //     : DateTime.now()
-    //           .difference(_originalTimePlanted!.toDate())
-    //           .inDays
-    //           .toString();
-    // plantedTimeCtrl = TextEditingController(text: days);
+    _loadCrop();
   }
 
   @override
@@ -77,11 +46,56 @@ class _CropBottomSheetState extends State<CropBottomSheet> {
     super.dispose();
   }
 
+  Future<void> _loadCrop() async {
+    final user = Auth().currentUser;
+    final farmId = Hive.box('farmulanDB').get('farmId') as String?;
+    final cropId = widget.plantInfo['cropId'] as String?;
+
+    if (farmId == null || user == null) {
+      showErrorToast(context, 'Farm ID or User missing');
+      return;
+    }
+
+    try {
+      final doc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .collection('farms')
+          .doc(farmId)
+          .collection('crops')
+          .doc(cropId)
+          .get();
+
+      if (!doc.exists) return;
+
+      final data = doc.data()!;
+      final name = data['name'] as String? ?? '';
+      final isGrowing = data['isGrowing'] as bool? ?? false;
+      final ts = data['timePlanted'] as Timestamp?;
+
+      // compute days since planted if applicable
+      final daysText = isGrowing && ts != null
+          ? DateTime.now().difference(ts.toDate()).inDays.toString()
+          : '';
+
+      if (mounted) {
+        setState(() {
+          cropNameCtrl.text = name;
+          dropdownValue = isGrowing ? 'Yes' : 'No';
+          plantedTimeCtrl.text = daysText;
+        });
+      }
+    } catch (e) {
+      if (mounted) showErrorToast(context, 'Failed to load crop: $e');
+    }
+  }
+
   Future<void> _editCrop() async {
     final nameText = cropNameCtrl.text.trim();
     final isGrowing = dropdownValue == 'Yes';
+    final cropId = widget.plantInfo['cropId'] as String?;
 
-    if (nameText.isEmpty || dropdownValue == null) {
+    if (nameText.isEmpty || dropdownValue == null || cropId == null) {
       showErrorToast(context, 'Please fill out all fields.');
       return;
     }
@@ -99,7 +113,7 @@ class _CropBottomSheetState extends State<CropBottomSheet> {
       }
     }
 
-    setState(() => isUpdating = true);
+    if (mounted) setState(() => isUpdating = true);
     try {
       final box = Hive.box('farmulanDB');
       final farmId = box.get('farmId') as String?;
@@ -109,159 +123,95 @@ class _CropBottomSheetState extends State<CropBottomSheet> {
         return;
       }
 
-      final farmDoc = FirebaseFirestore.instance
-          .collection('users')
-          .doc(user.uid)
-          .collection('farms')
-          .doc(farmId);
+      final plantingDate = isGrowing
+          ? DateTime.now().subtract(Duration(days: daysSince!))
+          : null; // If not growing, timePlanted is null
 
-      // Construct old & new crop maps
-      // final oldCrop = {
-      //   'name': widget.plantInfo['name'],
-      //   'isGrowing': widget.plantInfo['isGrowing'],
-      //   // reconstruct a Timestamp for comparison
-      //   'timePlanted': Timestamp.fromDate(
-      //     DateTime.now().subtract(
-      //       Duration(days: widget.plantInfo['timePlanted']),
-      //     ),
-      //   ),
-      //   'growthStage': widget.plantInfo['growthStage'],
-      // };
-
-      final Map<String, dynamic> oldCrop = {
-        'name': widget.plantInfo['name'],
-        'isGrowing': widget.plantInfo['isGrowing'],
-        'timePlanted':
-            _originalTimePlanted, // Use the stored original Timestamp
-        'growthStage': widget.plantInfo['growthStage'],
-      };
-
-      // final newCrop = {
-      //   'name': nameText,
-      //   'isGrowing': isGrowing,
-      //   'timePlanted': isGrowing
-      //       ? Timestamp.fromDate(
-      //           DateTime.now().subtract(Duration(days: daysSince!)),
-      //         )
-      //       : null,
-      //   'growthStage': isGrowing ? 1 : 0,
-      // };
       final Map<String, dynamic> newCrop = {
+        'cropId': cropId,
         'name': nameText,
         'isGrowing': isGrowing,
-        'timePlanted': isGrowing
-            ? Timestamp.fromDate(
-                DateTime.now().subtract(Duration(days: daysSince!)),
-              )
-            : null, // If not growing, timePlanted is null
+        'timePlanted': plantingDate,
         'growthStage': isGrowing ? 1 : 0,
       };
 
-      // Firestore: remove old, add new
-      await farmDoc.update({
-        'crops': FieldValue.arrayRemove([oldCrop]),
-      });
-      await farmDoc.update({
-        'crops': FieldValue.arrayUnion([newCrop]),
-      });
+      // Update Firestore
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .collection('farms')
+          .doc(farmId)
+          .collection('crops')
+          .doc(cropId)
+          .update(newCrop);
 
-      // Hive mirror
-      final rawList = box.get('crops') as List<dynamic>? ?? [];
-      final current = rawList
-          .map((e) => Map<String, dynamic>.from(e as Map))
-          .toList();
-      // remove by matching name + planted-date
-      final timestamp = newCrop['timePlanted'] as Timestamp?;
-      final hiveCrop = {
-        'name': newCrop['name'],
-        'isGrowing': newCrop['isGrowing'],
-        'timePlanted': timestamp?.toDate(), // <-- DateTime instead of Timestamp
-        'growthStage': newCrop['growthStage'],
+      // Updating Hive (Hive mirror)
+      final Map<String, dynamic> newCropHive = {
+        'cropId': cropId,
+        'name': nameText,
+        'isGrowing': isGrowing,
+        'timePlanted': plantingDate,
+        'growthStage': isGrowing ? 1 : 0,
       };
 
-      current.removeWhere((m) {
-        if (m['name'] != oldCrop['name']) return false;
-        final dynamic mRaw = m['timePlanted'];
-        final dynamic oRaw = oldCrop['timePlanted'];
-        if (mRaw == null && oRaw == null) {
-          return true;
-        }
-        if (mRaw is Timestamp && oRaw is Timestamp) {
-          return mRaw.toDate().isAtSameMomentAs(oRaw.toDate());
-        }
-        return false;
-      });
-      current.add(hiveCrop);
-      await box.put('crops', current);
+      final rawList = box.get('crops') as List<dynamic>? ?? [];
+      final updatedList = rawList
+          .map((e) => Map<String, dynamic>.from(e as Map))
+          .toList();
 
-      if (!mounted) return;
-      Navigator.of(context).pop();
-      showSuccessToast(context, 'Crop updated!');
+      // remove by matching cropId
+      updatedList.removeWhere((m) => m['cropId'] == cropId);
+      updatedList.add(newCropHive);
+
+      await box.put('crops', updatedList);
+
+      if (mounted) {
+        Navigator.of(context).pop();
+        showSuccessToast(context, 'Crop updated!');
+      }
     } catch (e) {
-      print('Error editing crop: $e');
-      showErrorToast(context, 'Failed to update crop: $e');
+      debugPrint('Error editing crop: $e');
+      if (mounted) showErrorToast(context, 'Failed to update crop: $e');
     } finally {
       if (mounted) setState(() => isUpdating = false);
     }
   }
 
   Future<void> _deleteCrop() async {
-    setState(() => isUpdating = true);
+    if (mounted) setState(() => isUpdating = true);
     try {
       final box = Hive.box('farmulanDB');
       final farmId = box.get('farmId') as String?;
       final user = Auth().currentUser;
-      if (farmId == null || user == null) {
-        showErrorToast(context, 'Farm ID or User missing');
+      final cropId = widget.plantInfo['cropId'] as String?;
+
+      if (farmId == null || user == null || cropId == null) {
+        showErrorToast(context, 'Missing farm or crop ID');
         return;
       }
 
-      final farmDoc = FirebaseFirestore.instance
+      await FirebaseFirestore.instance
           .collection('users')
           .doc(user.uid)
           .collection('farms')
-          .doc(farmId);
+          .doc(farmId)
+          .collection('crops')
+          .doc(cropId)
+          .delete();
 
-      // Build old crop map as above
-      final oldCrop = {
-        'name': widget.plantInfo['name'],
-        'isGrowing': widget.plantInfo['isGrowing'],
-        'timePlanted': Timestamp.fromDate(
-          DateTime.now().subtract(
-            Duration(days: widget.plantInfo['timePlanted']),
-          ),
-        ),
-        'growthStage': widget.plantInfo['growthStage'],
-      };
-      // final Map<String, dynamic> oldCrop = {
-      //   'name': widget.plantInfo['name'],
-      //   'isGrowing': widget.plantInfo['isGrowing'],
-      //   'timePlanted': _originalTimePlanted,
-      //   'growthStage': widget.plantInfo['growthStage'],
-      // };
-
-      // Firestore: remove it & decrement
-      await farmDoc.update({
-        'crops': FieldValue.arrayRemove([oldCrop]),
-        'numOfCrops': FieldValue.increment(-1),
-      });
-
-      // Hive mirror
       final current = (box.get('crops') as List<dynamic>)
           .cast<Map<String, dynamic>>();
-      current.removeWhere(
-        (m) =>
-            m['name'] == oldCrop['name'] &&
-            (m['timePlanted'] as Timestamp).toDate() ==
-                (oldCrop['timePlanted'] as Timestamp).toDate(),
-      );
+      current.removeWhere((m) => m['cropId'] == cropId);
       await box.put('crops', current);
-      await box.put('numOfCrops', (box.get('numOfCrops') as int) - 1);
 
-      if (!mounted) return;
-      Navigator.of(context).pop();
-      showSuccessToast(context, 'Crop deleted.');
+      await box.put('numOfCrops', (box.get('numOfCrops') as int? ?? 1) - 1);
+
+      if (mounted) {
+        Navigator.of(context).pop();
+        showSuccessToast(context, 'Crop deleted.');
+      }
     } catch (e) {
+      if (!mounted) return;
       showErrorToast(context, 'Failed to delete crop: $e');
     } finally {
       if (mounted) setState(() => isUpdating = false);
