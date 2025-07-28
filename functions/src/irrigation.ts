@@ -1,9 +1,9 @@
-import { onCall, HttpsError } from 'firebase-functions/v2/https';
-import * as logger from 'firebase-functions/logger';
-import * as admin from 'firebase-admin';
-import { fetchWeatherApi } from 'openmeteo';
-import { onSchedule } from 'firebase-functions/v2/scheduler';
-import fetch from 'node-fetch';
+import {onCall, HttpsError} from "firebase-functions/v2/https";
+import * as logger from "firebase-functions/logger";
+import * as admin from "firebase-admin";
+import {fetchWeatherApi} from "openmeteo";
+import {onSchedule, ScheduledEvent} from "firebase-functions/v2/scheduler";
+// import fetch from "node-fetch";
 
 // Start writing functions
 // https://firebase.google.com/docs/functions/typescript
@@ -19,70 +19,83 @@ interface GetFarmDataRequest {
 //   elevation: number;
 // }
 
-export const getFarmData = onCall<GetFarmDataRequest, { elevation: number }>(
-  async (request) => {
-    const { data, auth } = request;
+interface ProcessedMeteorData {
+  tMax: number;
+  tMin: number;
+  sunshineDuration: number;
+  rhMax: number;
+  rhMin: number;
+  windSpeed: number; // This is averageWindSpeed
+  height: number; // Fixed at 10 in your code
+  latitude: number;
+  longitude: number;
+}
 
-    if (!auth?.uid) {
-      logger.warn('Unauthenticated call to getFarmData');
-      throw new HttpsError('unauthenticated', 'You must be signed in.');
-    }
+export const getFarmData = onCall<
+  GetFarmDataRequest,
+  Promise<{ elevation: number }>
+>(async (request) => {
+  const {data, auth} = request;
 
-    if (data.userId && data.userId !== auth.uid) {
-      logger.warn(`UID ${auth.uid} tried to read ${data.userId}`);
-      throw new HttpsError(
-        'permission-denied',
-        'Cannot read another user’s farm data.',
-      );
-    }
+  if (!auth?.uid) {
+    logger.warn("Unauthenticated call to getFarmData");
+    throw new HttpsError("unauthenticated", "You must be signed in.");
+  }
 
-    const farmId = data.farmId;
-    if (!farmId) {
-      throw new HttpsError('invalid-argument', 'farmId required');
-    }
+  if (data.userId && data.userId !== auth.uid) {
+    logger.warn(`UID ${auth.uid} tried to read ${data.userId}`);
+    throw new HttpsError(
+      "permission-denied",
+      "Cannot read another user’s farm data.",
+    );
+  }
 
-    const farmRef = db
-      .collection('users')
-      .doc(auth.uid)
-      .collection('farms')
-      .doc(farmId);
+  const farmId = data.farmId;
+  if (!farmId) {
+    throw new HttpsError("invalid-argument", "farmId required");
+  }
 
-    const snap = await farmRef.get();
-    if (!snap.exists) {
-      throw new HttpsError('not-found', `Farm ${farmId} not found`);
-    }
+  const farmRef = db
+    .collection("users")
+    .doc(auth.uid)
+    .collection("farms")
+    .doc(farmId);
 
-    const farm = snap.data()!;
-    const coord = farm.coord as admin.firestore.GeoPoint | undefined;
-    if (!coord) {
-      throw new HttpsError('internal', 'coord not set');
-    }
+  const snap = await farmRef.get();
+  if (!snap.exists) {
+    throw new HttpsError("not-found", `Farm ${farmId} not found`);
+  }
 
-    const lat = coord.latitude;
-    const lon = coord.longitude;
-    if (typeof lat !== 'number' || typeof lon !== 'number') {
-      throw new HttpsError('internal', 'coord malformed');
-    }
+  const farm = snap.data()!;
+  const coord = farm.coord as admin.firestore.GeoPoint | undefined;
+  if (!coord) {
+    throw new HttpsError("internal", "coord not set");
+  }
 
-    const elevationResp = await fetchElevation(lat, lon);
-    const elevation = Array.isArray(elevationResp.elevation)
-      ? elevationResp.elevation[0]
-      : undefined;
+  const lat = coord.latitude;
+  const lon = coord.longitude;
+  if (typeof lat !== "number" || typeof lon !== "number") {
+    throw new HttpsError("internal", "coord malformed");
+  }
 
-    if (typeof elevation !== 'number') {
-      throw new HttpsError('internal', 'Bad elevation payload');
-    }
+  const elevationResp = await fetchElevation(lat, lon);
+  const elevation = Array.isArray(elevationResp.elevation) ?
+    elevationResp.elevation[0] :
+    undefined;
 
-    await farmRef.update({
-      'meteorData.elevation': elevation,
-      'meteorData.latitude': lat,
-    });
+  if (typeof elevation !== "number") {
+    throw new HttpsError("internal", "Bad elevation payload");
+  }
 
-    logger.info(`Farm ${farmId} elevation set to ${elevation}`);
+  await farmRef.update({
+    "meteorData.elevation": elevation,
+    "meteorData.latitude": lat,
+  });
 
-    return { elevation };
-  },
-);
+  logger.info(`Farm ${farmId} elevation set to ${elevation}`);
+
+  return {elevation};
+});
 
 /**
  * Calls the Open‑Meteo elevation API and returns the raw JSON response.
@@ -93,34 +106,29 @@ export const getFarmData = onCall<GetFarmDataRequest, { elevation: number }>(
  */
 async function fetchElevation(lat: number, lon: number) {
   const url =
-    'https://api.open-meteo.com/v1/elevation?' +
+    "https://api.open-meteo.com/v1/elevation?" +
     `latitude=${lat}&longitude=${lon}`;
   const resp = await fetch(url);
   if (!resp.ok) {
     const text = await resp.text();
     logger.error(`Elevation API ${resp.status}`, text);
-    throw new HttpsError('internal', `Elevation API error ${resp.status}`);
+    throw new HttpsError("internal", `Elevation API error ${resp.status}`);
   }
   return resp.json();
 }
 
 export const scheduledMeteorUpdate = onSchedule(
-  '0 0 * * *', // Runs daily at midnight UTC
-  {
-    timezone: 'Etc/UTC',
-    timeoutSeconds: 540,
-  },
-  async (event) => {
-    logger.log('Starting scheduledMeteorUpdate...');
+  "every day 00:00",
+  async (event: ScheduledEvent) => {
+    // <--- Event type for scheduled functions is 'ScheduleEvent' or 'any' if not specific
+    logger.log("Starting scheduledMeteorUpdate...");
 
     try {
-      // List all user documents
-      const usersRefs = await db.collection('users').listDocuments();
+      const usersRefs = await db.collection("users").listDocuments();
       logger.info(`Found ${usersRefs.length} user(s).`);
 
       for (const userRef of usersRefs) {
-        // List all farm documents for each user
-        const farmsRefs = await userRef.collection('farms').listDocuments();
+        const farmsRefs = await userRef.collection("farms").listDocuments();
         logger.info(`User ${userRef.id} has ${farmsRefs.length} farm(s).`);
 
         for (const farmRef of farmsRefs) {
@@ -144,78 +152,101 @@ export const scheduledMeteorUpdate = onSchedule(
             const lat = coord.latitude;
             const lon = coord.longitude;
 
-            // Optional: Basic validation for lat/lon
-            if (typeof lat !== 'number' || typeof lon !== 'number') {
+            if (typeof lat !== "number" || typeof lon !== "number") {
               logger.warn(
                 `Farm ${farmRef.path} has malformed coordinates; skipping`,
               );
               continue;
             }
 
-            const today = dayOfTheYear(); // Get current day of the year
+            const today = dayOfTheYear();
 
-            // Call getMeteorData (make sure it's defined and imported/scoped correctly)
-            const meteorData = await getMeteorData(lat, lon); // <--- Correctly await the call
+            const meteorData = await getMeteorData(lat, lon); // Await the call
 
             await farmRef.update({
-              'meteorData.tMax': meteorData.tMax,
-              'meteorData.tMin': meteorData.tMin,
-              'meteorData.sunshineDuration': meteorData.sunshineDuration,
-              'meteorData.rhMax': meteorData.rhMax,
-              'meteorData.rhMin': meteorData.rhMin,
-              'meteorData.windSpeed': meteorData.windSpeed,
-              'meteorData.height': meteorData.height,
-              'meteorData.latitude': meteorData.latitude,
-              'meteorData.longitude': meteorData.longitude, // Add longitude here
-              'meteorData.dayOfYear': today + 1, // forecast is for tomorrow, this is fine
+              "meteorData.tMax": meteorData.tMax,
+              "meteorData.tMin": meteorData.tMin,
+              "meteorData.sunshineDuration": meteorData.sunshineDuration,
+              "meteorData.rhMax": meteorData.rhMax,
+              "meteorData.rhMin": meteorData.rhMin,
+              "meteorData.windSpeed": meteorData.windSpeed,
+              "meteorData.height": meteorData.height,
+              "meteorData.latitude": meteorData.latitude,
+              "meteorData.longitude": meteorData.longitude,
+              "meteorData.dayOfYear": today + 1,
             });
 
             logger.info(`Updated meteorData for farm ${farmRef.path}`);
           } catch (farmError: any) {
             logger.error(`Error processing farm ${farmRef.path}:`, farmError);
-            // Continue to the next farm even if one fails
           }
         }
       }
-      logger.log('ScheduledMeteorUpdate completed successfully.');
+      logger.log("ScheduledMeteorUpdate completed successfully.");
     } catch (mainError: any) {
-      logger.error('Error in scheduledMeteorUpdate main loop:', mainError);
-      // Re-throw the error to indicate failure to Cloud Functions
+      logger.error("Error in scheduledMeteorUpdate main loop:", mainError);
       throw mainError;
     }
   },
 );
 
-function dayOfTheYear() {
+// export const scheduledMeteorUpdate = onSchedule(
+//   "0 0 * * *", // Runs daily at midnight UTC
+//   {
+//     schedule: "0 0 * * *",
+//     timezone: "Etc/UTC",
+//     timeoutSeconds: 540,
+//   },
+//
+// );
+
+/**
+ * Calculates day of year.
+ * @return {number}
+ */
+function dayOfTheYear(): number {
   const today = new Date();
-  return Math.ceil((today - new Date(today.getFullYear(), 0, 1)) / 86400000);
+  return Math.ceil(
+    (today.getTime() - new Date(today.getFullYear(), 0, 1).getTime()) /
+      86400000,
+  );
 }
 
-async function getMeteorData(lat: number, lon: number) {
+/**
+ * Calls the Open‑Meteo meteorological API and returns the JSON response.
+ *
+ * @param {number} lat - The latitude to look up.
+ * @param {number} lon - The longitude to look up.
+ * @return {Promise<ProcessedMeteorData>}
+ */
+async function getMeteorData(
+  lat: number,
+  lon: number,
+): Promise<ProcessedMeteorData> {
   const params = {
     latitude: lat,
     longitude: lon,
     daily: [
-      'temperature_2m_max',
-      'temperature_2m_min',
-      'sunshine_duration',
-      'wind_speed_10m_max',
+      "temperature_2m_max",
+      "temperature_2m_min",
+      "sunshine_duration",
+      "wind_speed_10m_max",
     ],
-    hourly: ['temperature_2m', 'relative_humidity_2m', 'wind_speed_10m'],
-    current: ['temperature_2m', 'relative_humidity_2m', 'wind_speed_10m'],
-    timezone: 'auto',
+    hourly: ["temperature_2m", "relative_humidity_2m", "wind_speed_10m"],
+    current: ["temperature_2m", "relative_humidity_2m", "wind_speed_10m"],
+    timezone: "auto",
     forecast_days: 1,
   };
 
-  const url = 'https://api.open-meteo.com/v1/forecast';
+  const url = "https://api.open-meteo.com/v1/forecast";
   let responses: any;
   try {
     responses = await fetchWeatherApi(url, params);
   } catch (error: any) {
-    logger.error('Error fetching Open-Meteo API data:', error);
+    logger.error("Error fetching Open-Meteo API data:", error);
     throw new HttpsError(
-      'internal',
-      'Failed to fetch weather data from Open-Meteo.',
+      "internal",
+      "Failed to fetch weather data from Open-Meteo.",
       error.message,
     );
   }
@@ -225,10 +256,6 @@ async function getMeteorData(lat: number, lon: number) {
 
   // Attributes for timezone and location
   const utcOffsetSeconds = response.utcOffsetSeconds();
-  const timezone = response.timezone();
-  const timezoneAbbreviation = response.timezoneAbbreviation();
-  const latitude = response.latitude();
-  const longitude = response.longitude();
 
   const current = response.current()!;
   const hourly = response.hourly()!;
@@ -281,13 +308,13 @@ async function getMeteorData(lat: number, lon: number) {
   // Calculate the average wind speed, max humidity and min humidity for first day forecast
   let totalSpeed = 0;
   let minHumidity =
-    weatherData.hourly.relativeHumidity2m.length > 0
-      ? weatherData.hourly.relativeHumidity2m[0]
-      : 101;
+    weatherData.hourly.relativeHumidity2m.length > 0 ?
+      weatherData.hourly.relativeHumidity2m[0] :
+      101;
   let maxHumidity =
-    weatherData.hourly.relativeHumidity2m.length > 0
-      ? weatherData.hourly.relativeHumidity2m[0]
-      : -1;
+    weatherData.hourly.relativeHumidity2m.length > 0 ?
+      weatherData.hourly.relativeHumidity2m[0] :
+      -1;
 
   if (weatherData.hourly.relativeHumidity2m.length > 0) {
     for (let i = 0; i < weatherData.hourly.time.length; i++) {
@@ -299,13 +326,13 @@ async function getMeteorData(lat: number, lon: number) {
         currentHumValue > maxHumidity ? currentHumValue : maxHumidity;
     }
   } else {
-    logger.warn('No hourly humidity data found.');
+    logger.warn("No hourly humidity data found.");
     // Decide how to handle this: throw an error, return default values, etc.
     // For now, let's set default or indicate an error.
     // Or ensure the loop below handles empty array gracefully
   }
 
-  averageWindSpeed = totalSpeed / (weatherData.hourly.time.length || 1);
+  const averageWindSpeed = totalSpeed / (weatherData.hourly.time.length || 1);
 
   const i = 0; // first day forecast
   const meteorData = {
@@ -317,6 +344,7 @@ async function getMeteorData(lat: number, lon: number) {
     windSpeed: averageWindSpeed,
     height: 10,
     latitude: lat,
+    longitude: lon,
   };
   return meteorData;
 }

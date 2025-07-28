@@ -1,12 +1,12 @@
-import { setGlobalOptions } from 'firebase-functions/v2';
-import { onRequest } from 'firebase-functions/https';
-import * as logger from 'firebase-functions/logger';
+import {setGlobalOptions} from "firebase-functions/v2";
+import {onRequest} from "firebase-functions/https";
+import * as logger from "firebase-functions/logger";
 
-export { getFarmData } from './irrigation';
+export {getFarmData, scheduledMeteorUpdate} from "./irrigation";
 
 // Start writing functions
 // https://firebase.google.com/docs/functions/typescript
-setGlobalOptions({ maxInstances: 10 });
+setGlobalOptions({maxInstances: 10});
 
 // export const helloWorld = onRequest((request, response) => {
 //   logger.info("Hello logs!", {structuredData: true});
@@ -31,17 +31,17 @@ setGlobalOptions({ maxInstances: 10 });
 // }
 
 export const fetchWeather = onRequest(async (request, response) => {
-  logger.info('Request received', { structuredData: true });
+  logger.info("Request received", {structuredData: true});
 
-  if (request.method !== 'POST') {
-    response.status(405).send('Method Not Allowed');
+  if (request.method !== "POST") {
+    response.status(405).send("Method Not Allowed");
     return;
   }
 
   // Ensure request body is parsed as JSON
   let coord: [number, number];
   try {
-    if (typeof request.body === 'string') {
+    if (typeof request.body === "string") {
       // If the body is a string, try parsing it as JSON
       const parsedBody = JSON.parse(request.body);
       coord = parsedBody.coord;
@@ -50,8 +50,8 @@ export const fetchWeather = onRequest(async (request, response) => {
       coord = request.body.coord;
     }
   } catch (parseError: any) {
-    logger.error('Failed to parse request body as JSON', parseError);
-    response.status(400).send('Invalid JSON in request body');
+    logger.error("Failed to parse request body as JSON", parseError);
+    response.status(400).send("Invalid JSON in request body");
     return;
   }
 
@@ -59,8 +59,8 @@ export const fetchWeather = onRequest(async (request, response) => {
     !coord ||
     !Array.isArray(coord) ||
     coord.length !== 2 ||
-    typeof coord[0] !== 'number' ||
-    typeof coord[1] !== 'number'
+    typeof coord[0] !== "number" ||
+    typeof coord[1] !== "number"
   ) {
     response
       .status(400)
@@ -72,8 +72,8 @@ export const fetchWeather = onRequest(async (request, response) => {
   logger.info(rapidApiKey);
 
   if (!rapidApiKey) {
-    logger.error('RapidAPI key not configured.');
-    response.status(500).send('Server configuration error: API key missing.');
+    logger.error("RapidAPI key not configured.");
+    response.status(500).send("Server configuration error: API key missing.");
     return;
   }
 
@@ -82,10 +82,10 @@ export const fetchWeather = onRequest(async (request, response) => {
   https://open-weather13.p.rapidapi.com/latlon?latitude=${lat}&longitude=${lon}&lang=EN
   `;
   const options = {
-    method: 'GET',
+    method: "GET",
     headers: {
-      'x-rapidapi-key': rapidApiKey,
-      'x-rapidapi-host': 'open-weather13.p.rapidapi.com',
+      "x-rapidapi-key": rapidApiKey,
+      "x-rapidapi-host": "open-weather13.p.rapidapi.com",
     },
   };
 
@@ -101,12 +101,12 @@ export const fetchWeather = onRequest(async (request, response) => {
     const result = await fetchRes.json(); // Expect JSON response
     response.json(result); // Send back as JSON
   } catch (err: any) {
-    logger.error('Weather fetch failed', {
+    logger.error("Weather fetch failed", {
       error: err.message,
       stack: err.stack,
     });
     response
       .status(500)
-      .send(`Error fetching weather: ${err.message || 'Unknown error'}`);
+      .send(`Error fetching weather: ${err.message || "Unknown error"}`);
   }
 });
