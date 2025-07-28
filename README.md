@@ -1,12 +1,12 @@
 # Farmulan 2
 
-## LINK TO DEMO VIDEO: https://drive.google.com/file/d/17dsf9IUm-cG2yG_PU2prHnpHq_Y7OTsa/view?usp=sharing
+## LINK TO DEMO VIDEO: [https://drive.google.com/file/d/17dsf9IUm-cG2yG\_PU2prHnpHq\_Y7OTsa/view?usp=sharing](https://drive.google.com/file/d/17dsf9IUm-cG2yG_PU2prHnpHq_Y7OTsa/view?usp=sharing)
 
-## LINK TO GITHUB REPOSITORY: https://github.com/dkokonkwo/farmulan.git
+## LINK TO GITHUB REPOSITORY: [https://github.com/dkokonkwo/farmulan\_2.git](https://github.com/dkokonkwo/farmulan_2.git)
 
 ## Project Overview
 
-Welcome to Farmulan! This is a Flutter project designed to help farmers manage their crops, and provide real-time sensor data from on-farm sensors.
+Welcome to Farmulan! This is a Flutter project designed to help farmers manage their crops and provide real-time sensor data from on-farm sensors.
 
 ## Getting Started
 
@@ -19,6 +19,7 @@ Before you begin, ensure you have the following installed on your system:
 * **Flutter SDK:** Follow the official Flutter installation guide: [https://flutter.dev/docs/get-started/install](https://flutter.dev/docs/get-started/install)
 * **Git:** For cloning the repository.
 * **An IDE (Integrated Development Environment):**
+
     * [Visual Studio Code](https://code.visualstudio.com/) with the Flutter extension.
     * [Android Studio](https://developer.android.com/studio) with the Flutter plugin.
 * **Android SDK (if targeting Android):** Usually comes with Android Studio.
@@ -28,65 +29,133 @@ Before you begin, ensure you have the following installed on your system:
 
 Follow these steps to get your project up and running:
 
-1.  **Clone the repository:**
+1. **Clone the repository:**
 
-    ```bash
-    git clone [https://github.com/your-username/farmulan.git](https://github.com/dkokonkwo/farmulan.git)
-    cd farmulan
-    ```
+   ```bash
+   git clone https://github.com/dkokonkwo/farmulan_2.git
+   cd farmulan_2
+   ```
 
-2.  **Install Dependencies:**
+2. **Install Dependencies:**
 
-    Navigate to the project's root directory (where `pubspec.yaml` is located) and run the following command to fetch all the dependencies listed in `pubspec.yaml`:
+   Run:
 
-    ```bash
-    flutter pub get
-    ```
-
-    This command reads the `pubspec.yaml` file, downloads all the required packages (dependencies) from [pub.dev](https://pub.dev/), and makes them available for your project. You should see output similar to:
-
-    ```
-    Resolving dependencies...
-    (various package downloads and resolutions)
-    Got dependencies!
-    ```
+   ```bash
+   flutter pub get
+   ```
 
 ### Running the Project
 
-Once the dependencies are installed, you can run the application on an emulator, simulator, or a physical device.
+1. **Start an Emulator/Simulator or Connect a Device:**
 
-1.  **Start an Emulator/Simulator or Connect a Device:**
-    * **Android Emulator:** Open Android Studio, go to `Tools > Device Manager`, and start a virtual device.
-    * **iOS Simulator (macOS only):** Open Xcode, go to `Xcode > Open Developer Tool > Simulator`.
-    * **Physical Device:** Enable USB debugging on your Android device or enable Developer Mode on your iOS device and connect it to your computer via USB.
+    * **Android Emulator:** Open Android Studio → Tools > Device Manager → start a virtual device.
+    * **iOS Simulator (macOS only):** Open Xcode → Xcode > Open Developer Tool > Simulator.
+    * **Physical Device:** Enable USB debugging on Android or Developer Mode on iOS, then connect via USB.
 
-2.  **Verify Connected Devices:**
-    You can check if Flutter detects your device by running:
+2. **Verify Connected Devices:**
 
-    ```bash
-    flutter devices
-    ```
+   ```bash
+   flutter devices
+   ```
 
-    You should see your connected device listed.
+3. **Run the Application:**
 
-3.  **Run the Application:**
-    With a device or emulator running and selected, execute the following command from the project's root directory:
+   ```bash
+   flutter run
+   ```
 
-    ```bash
-    flutter run
-    ```
+## Firebase Backend Integration
 
-    This command will build the application and deploy it to your selected device/emulator. The first build might take some time.
+Follow these steps to connect the Flutter frontend with the Firebase backend (Firestore & Cloud Functions):
 
-    For debug mode, you'll see output similar to the one you provided earlier:
+1. **Set Up Firebase Project**
 
-    ```
-    Launching lib\main.dart on sdk gphone64 x86 64 in debug mode...
-    Running Gradle task 'assembleDebug'...
-    ...
-    Debug service listening on ws://127.0.0.1:XXXXX/ws
-    Syncing files to device sdk gphone64 x86 64...
-    ```
+    * In the [Firebase Console](https://console.firebase.google.com/), create or select your project.
+    * Enable **Cloud Firestore** and **Cloud Functions** in the console.
+    * Add Android and/or iOS apps in **Project Settings > General**, then download:
 
-    Your app should now be running on your device!
+        * `google-services.json` → place under `android/app/`
+        * `GoogleService-Info.plist` → place under `ios/Runner/`
 
+2. **Install Firebase Packages**
+   Add to `pubspec.yaml`:
+
+   ```yaml
+   dependencies:
+     firebase_core: ^2.0.0
+     cloud_firestore: ^4.0.0
+     firebase_functions: ^4.0.0
+     firebase_auth: ^4.0.0
+   ```
+
+   Then run:
+
+   ```bash
+   flutter pub get
+   ```
+
+3. **Initialize Firebase**
+   In `lib/main.dart`:
+
+   ```dart
+   import 'package:firebase_core/firebase_core.dart';
+   import 'firebase_options.dart'; // from flutterfire CLI
+
+   void main() async {
+     WidgetsFlutterBinding.ensureInitialized();
+     await Firebase.initializeApp(
+       options: DefaultFirebaseOptions.currentPlatform,
+     );
+     runApp(const MyApp());
+   }
+   ```
+
+   Generate `firebase_options.dart` using the [FlutterFire CLI](https://firebase.flutter.dev/docs/cli/).
+
+4. **Configure Firestore Collections**
+
+    * **sensors**: stores real-time readings (temperature, humidity, radiation, soil moisture).
+    * **schedules**: holds computed ET₀, Kc, and next irrigation time for each plot.
+
+   Example usage in Flutter:
+
+   ```dart
+   final firestore = FirebaseFirestore.instance;
+   // Listen to sensor data
+   firestore.collection('sensors').doc(nodeId).snapshots();
+   // Update schedule
+   firestore.collection('schedules').doc(plotId).set({
+     'nextIrrigation': timestamp,
+     // ...other fields
+   });
+   ```
+
+5. **Deploy Cloud Functions**
+   In the `functions/` folder (JavaScript/TypeScript):
+
+   ```bash
+   cd functions
+   npm install
+   npx firebase deploy --only functions
+   ```
+
+    * **computeEt0**: triggers on weather updates to calculate ET₀.
+    * **scheduleIrrigation**: HTTP function to update irrigation schedules on demand.
+
+6. **Calling Functions from Flutter**
+
+   ```dart
+   final functions = FirebaseFunctions.instance;
+   final result = await functions.httpsCallable('scheduleIrrigation').call({
+     'plotId': plotId,
+   });
+   ```
+
+7. **Logging & Overrides**
+
+    * Use Firestore snapshots for real-time UI updates.
+    * Log manual overrides in a subcollection `schedules/{plotId}/overrides`.
+
+---
+
+Enjoy developing with Farmulan!
