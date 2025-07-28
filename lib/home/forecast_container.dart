@@ -275,6 +275,34 @@ class _GPSLocatorState extends State<GPSLocator> {
   final _myBox = Hive.box('farmulanDB');
 
   void _askForLocation() async {
+    final user = Auth().currentUser;
+    if (user == null) {
+      showErrorToast(context, 'User not signed in');
+      return;
+    }
+
+    if (!await Geolocator.isLocationServiceEnabled()) {
+      if (!mounted) return;
+      showErrorToast(
+        context,
+        'Location services are disabled. Please allow the app to use your location',
+      );
+      return;
+    }
+
+    var permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied ||
+        permission == LocationPermission.deniedForever) {
+      permission = await Geolocator.requestPermission();
+    }
+
+    if (permission != LocationPermission.always &&
+        permission != LocationPermission.whileInUse) {
+      if (!mounted) return;
+      showErrorToast(context, 'Location permission denied.');
+      return;
+    }
+
     showDialog(
       barrierDismissible: false,
       context: context,
@@ -299,31 +327,6 @@ class _GPSLocatorState extends State<GPSLocator> {
         ),
       ),
     );
-
-    final user = Auth().currentUser;
-    if (user == null) {
-      showErrorToast(context, 'User not signed in');
-      return;
-    }
-
-    if (!await Geolocator.isLocationServiceEnabled()) {
-      if (!mounted) return;
-      showErrorToast(context, 'Location services are disabled.');
-      return;
-    }
-
-    var permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied ||
-        permission == LocationPermission.deniedForever) {
-      permission = await Geolocator.requestPermission();
-    }
-
-    if (permission != LocationPermission.always &&
-        permission != LocationPermission.whileInUse) {
-      if (!mounted) return;
-      showErrorToast(context, 'Location permission denied.');
-      return;
-    }
 
     // fetch the position and store in hive
     Position pos;

@@ -1,9 +1,10 @@
 import 'package:farmulan/home/forecast_container.dart';
-import 'package:farmulan/home/home_carousel.dart';
+import 'package:farmulan/home/home_banner.dart';
 import 'package:farmulan/home/sensor_item.dart';
 import 'package:farmulan/utils/constants/glass_container.dart';
 import 'package:farmulan/utils/constants/icons.dart';
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 
 class HomePage extends StatefulWidget {
   final ValueChanged<int> navCallback;
@@ -14,6 +15,8 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  final box = Hive.box('farmulanDB');
+
   @override
   Widget build(BuildContext context) {
     double smallWidth = MediaQuery.of(context).size.width / 3.42;
@@ -30,12 +33,8 @@ class _HomePageState extends State<HomePage> {
         title: 'Temperature',
         value: '23°c',
       ),
-      SingleData(icon: AppIcons.wind, title: 'Humidity', value: '74%'),
-      SingleData(
-        icon: AppIcons.bulb,
-        title: 'Light Intensity',
-        value: 'Online',
-      ),
+      SingleData(icon: AppIcons.wind, title: 'Humidity', value: '34%'),
+      SingleData(icon: AppIcons.bulb, title: 'Light Intensity', value: '1000'),
     ];
 
     List<MultipleData> multiContainerData = [
@@ -52,8 +51,9 @@ class _HomePageState extends State<HomePage> {
             SizedBox(height: 10),
             WeatherInfo(),
             SizedBox(height: 30),
-            HomeCarousel(),
-            SizedBox(height: 25),
+            // HomeCarousel(),
+            HomeBanner(),
+            SizedBox(height: 45),
             Wrap(
               spacing: 8.0,
               runSpacing: 15.0,

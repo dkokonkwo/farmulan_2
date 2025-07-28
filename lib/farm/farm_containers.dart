@@ -1,7 +1,9 @@
+import 'dart:convert';
+import 'dart:math';
 import 'dart:typed_data';
-import 'dart:ui';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:crypto/crypto.dart';
 import 'package:farmulan/farm/farm_tabs.dart';
 import 'package:farmulan/farm/plants.dart';
 import 'package:farmulan/farm/settings.dart';
@@ -13,87 +15,6 @@ import 'package:http/http.dart' as http;
 import '../authentication/auth.dart';
 import '../utils/constants/colors.dart';
 import '../utils/constants/toasts.dart';
-
-class TopContainer extends StatelessWidget {
-  const TopContainer({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    final width = MediaQuery.of(context).size.width / 1.11;
-    final borderRadius = BorderRadius.circular(20);
-    return ClipPath(
-      clipper: TrapClipper(),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-        child: Container(
-          width: width,
-          height: width / 1.46,
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                AppColors.secondary.withValues(alpha: 0.6),
-                AppColors.primary.withValues(alpha: 0.6),
-              ],
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-            ),
-            borderRadius: borderRadius,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.3),
-                blurRadius: 24,
-                spreadRadius: 0,
-                offset: const Offset(0, 8),
-              ),
-            ],
-            border: Border.all(
-              color: Colors.white.withValues(alpha: 0.2),
-              width: 2,
-            ),
-          ),
-          child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  width: width,
-                  height: width / 2.3,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    image: DecorationImage(
-                      image: AssetImage(AppImages.farmImg),
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  "Charlie's Farm",
-                  style: TextStyle(
-                    fontFamily: 'Zen Kaku Gothic Antique',
-                    fontSize: 20,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.white,
-                  ),
-                ),
-                Text(
-                  "ID: 1344295024",
-                  style: TextStyle(
-                    fontFamily: 'Zen Kaku Gothic Antique',
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.mainBg,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
 
 class TrapClipper extends CustomClipper<Path> {
   @override
@@ -247,7 +168,8 @@ class _FarmHeroSectionState extends State<FarmHeroSection> {
   Future<void> _loadUserDetails() async {
     final myBox = Hive.box('farmulanDB');
     firstName = myBox.get('firstName') as String? ?? '';
-    farmId = myBox.get('farmId') as String? ?? '';
+    final unHashedId = myBox.get('farmId') as String? ?? '';
+    farmId = unHashedId.isNotEmpty ? hashToNumber(unHashedId).toString() : '';
     bytes = myBox.get('farmImageBytes') as Uint8List?;
 
     if (bytes != null || farmId.isEmpty) {
@@ -305,6 +227,20 @@ class _FarmHeroSectionState extends State<FarmHeroSection> {
       if (!mounted) return;
       showErrorToast(context, 'Failed to fetch farm Image: $e');
     }
+  }
+
+  int hashToNumber(String input, {int digits = 8}) {
+    final bytes = utf8.encode(input);
+    final digest = sha256.convert(bytes);
+    final hex = digest.toString();
+
+    // Convert first 8 hex characters to int
+    final chunk = hex.substring(0, 8);
+    final num = int.parse(chunk, radix: 16);
+
+    // Reduce to desired digit count
+    final mod = pow(10, digits).toInt();
+    return num % mod;
   }
 
   @override

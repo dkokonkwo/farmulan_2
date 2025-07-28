@@ -27,20 +27,34 @@ class WelcomePage extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 8.0),
               child: Column(
                 children: [
-                  SizedBox(height: 80),
-                  Row(children: [Text('Logo')]),
-                  SizedBox(height: screenHeight / 2.3),
+                  SizedBox(height: screenHeight / 10),
+                  Row(
+                    children: [
+                      Image.asset(
+                        'assets/splash_screen/welcome_logo.png',
+                        width: screenWidth / 8,
+                      ),
+                      Image.asset(
+                        'assets/splash_screen/welcome_branding.png',
+                        width: screenWidth / 1.7,
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: screenHeight / 3),
                   Text(
                     'Welcome to FarMulan app',
                     style: TextStyle(
-                      fontSize: 32,
+                      fontFamily: 'Zen Kaku Gothic Antique',
+                      fontSize: 28,
                       fontWeight: FontWeight.bold,
                       color: AppColors.pageBackground,
                     ),
                   ),
+                  SizedBox(height: 10),
                   Text(
                     'Grow your crops efficiently and monitor your farm from any in the world',
                     style: TextStyle(
+                      fontFamily: 'Zen Kaku Gothic Antique',
                       fontSize: 18,
                       fontWeight: FontWeight.normal,
                       color: AppColors.pageBackground.withValues(alpha: 0.8),
@@ -64,6 +78,7 @@ class WelcomePage extends StatelessWidget {
                       child: Text(
                         'Register',
                         style: TextStyle(
+                          fontFamily: 'Zen Kaku Gothic Antique',
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                           color: AppColors.primary,
@@ -92,6 +107,7 @@ class WelcomePage extends StatelessWidget {
                       child: Text(
                         'Login',
                         style: TextStyle(
+                          fontFamily: 'Zen Kaku Gothic Antique',
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                           color: AppColors.pageBackground,

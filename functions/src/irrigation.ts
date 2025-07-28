@@ -23,6 +23,7 @@ interface ProcessedMeteorData {
   tMax: number;
   tMin: number;
   sunshineDuration: number;
+  daylightDuration: number;
   rhMax: number;
   rhMin: number;
   windSpeed: number; // This is averageWindSpeed
@@ -167,6 +168,7 @@ export const scheduledMeteorUpdate = onSchedule(
               "meteorData.tMax": meteorData.tMax,
               "meteorData.tMin": meteorData.tMin,
               "meteorData.sunshineDuration": meteorData.sunshineDuration,
+              "meteorData.sunshineDuration": meteorData.daylightDuration,
               "meteorData.rhMax": meteorData.rhMax,
               "meteorData.rhMin": meteorData.rhMin,
               "meteorData.windSpeed": meteorData.windSpeed,
@@ -190,15 +192,6 @@ export const scheduledMeteorUpdate = onSchedule(
   },
 );
 
-// export const scheduledMeteorUpdate = onSchedule(
-//   "0 0 * * *", // Runs daily at midnight UTC
-//   {
-//     schedule: "0 0 * * *",
-//     timezone: "Etc/UTC",
-//     timeoutSeconds: 540,
-//   },
-//
-// );
 
 /**
  * Calculates day of year.
@@ -231,6 +224,7 @@ async function getMeteorData(
       "temperature_2m_min",
       "sunshine_duration",
       "wind_speed_10m_max",
+      "daylight_duration",
     ],
     hourly: ["temperature_2m", "relative_humidity_2m", "wind_speed_10m"],
     current: ["temperature_2m", "relative_humidity_2m", "wind_speed_10m"],
@@ -302,6 +296,7 @@ async function getMeteorData(
       temperature2mMin: daily.variables(1)!.valuesArray()!,
       sunshineDuration: daily.variables(2)!.valuesArray()!,
       windSpeed10mMax: daily.variables(3)!.valuesArray()!,
+      daylightDuration: daily.variables(4)!.valuesArray()!,
     },
   };
 
@@ -339,6 +334,7 @@ async function getMeteorData(
     tMax: weatherData.daily.temperature2mMax[i],
     tMin: weatherData.daily.temperature2mMax[i],
     sunshineDuration: weatherData.daily.sunshineDuration[i],
+    daylightDuration: weatherData.daily.daylightDuration[i],
     rhMax: maxHumidity,
     rhMin: minHumidity,
     windSpeed: averageWindSpeed,

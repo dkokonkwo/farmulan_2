@@ -4,6 +4,7 @@ import 'package:farmulan/utils/constants/icons.dart';
 import 'package:farmulan/utils/constants/plant_details_appbar.dart';
 import 'package:farmulan/utils/constants/toasts.dart';
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 
 import '../../authentication/auth.dart';
 
@@ -44,10 +45,28 @@ class _MyAppBarState extends State<MyAppBar> {
           firstName = data['firstName'] as String? ?? '';
           lastName = data['lastName'] as String? ?? '';
         });
+        final box = Hive.box('farmulanDB');
+        await box.put('firstName', firstName);
+        await box.put('lastName', lastName);
+        await box.put('testFunction', 'hope this works');
       }
     } catch (e) {
       if (!mounted) return;
       showErrorToast(context, 'Error loading profile: $e');
+    }
+  }
+
+  String getGreeting() {
+    final hour = DateTime.now().hour;
+
+    if (hour >= 5 && hour < 12) {
+      return 'Good Morning!';
+    } else if (hour >= 12 && hour < 17) {
+      return 'Good Afternoon!';
+    } else if (hour >= 17 && hour < 21) {
+      return 'Good Evening!';
+    } else {
+      return 'Good Night!';
     }
   }
 
@@ -64,7 +83,7 @@ class _MyAppBarState extends State<MyAppBar> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Good Morning!',
+            getGreeting(),
             style: TextStyle(
               fontFamily: 'Zen Kaku Gothic Antique',
               fontSize: 24,

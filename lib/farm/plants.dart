@@ -6,7 +6,6 @@ import 'package:farmulan/farm/plant_item.dart';
 import 'package:farmulan/utils/constants/add_buttons.dart';
 import 'package:farmulan/utils/constants/colors.dart';
 import 'package:farmulan/utils/constants/icons.dart';
-import 'package:farmulan/utils/constants/skeletons.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive_flutter/adapters.dart';
@@ -170,19 +169,20 @@ class _PlantsTabState extends State<PlantsTab>
   late TabController _tabController;
   List<PlantInfo> crops = [];
   final myBox = Hive.box('farmulanDB');
-  bool _isLoadingInitialData = true;
+  bool _isLoadingInitialData = false;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+    setState(() {
+      _isLoadingInitialData = true;
+    });
     _loadCrops().then((_) {
       // Once _loadCrops completes (successfully or with error), set loading to false
-      if (mounted) {
-        setState(() {
-          _isLoadingInitialData = false;
-        });
-      }
+      setState(() {
+        _isLoadingInitialData = false;
+      });
     });
   }
 
@@ -228,9 +228,16 @@ class _PlantsTabState extends State<PlantsTab>
           );
         });
       });
+      setState(() {
+        _isLoadingInitialData = false;
+      });
     } catch (e) {
       if (!mounted) return;
       showErrorToast(context, 'Failed to fetch farm data: $e');
+    } finally {
+      setState(() {
+        _isLoadingInitialData = false;
+      });
     }
   }
 
@@ -238,19 +245,18 @@ class _PlantsTabState extends State<PlantsTab>
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width / 1.11;
     double height = MediaQuery.of(context).size.width / 1.4;
+    final farmId = myBox.get('farmId') as String? ?? '';
 
-    if (_isLoadingInitialData) {
+    if (farmId.isEmpty) {
       return Column(
         children: [
           SizedBox(
             height: height,
             width: width,
-            child: Stack(
-              children: [
-                // Left crop
-                Positioned(top: 25, left: 0, child: PlantBoxSkeleton()),
-                Positioned(top: 0, right: 0, child: PlantBoxSkeleton()),
-              ],
+            child: Center(
+              child:
+                  // Left crop
+                  AddCropButton(),
             ),
           ),
         ],
@@ -259,7 +265,7 @@ class _PlantsTabState extends State<PlantsTab>
     }
 
     return ValueListenableBuilder<Box<dynamic>>(
-      valueListenable: myBox.listenable(keys: ['crops']),
+      valueListenable: myBox.listenable(keys: ['numOfCrops']),
       builder: (context, Box b, _) {
         // safely read & convert to raw list
         final rawDynamic = b.get('crops') as List<dynamic>? ?? [];
@@ -276,8 +282,8 @@ class _PlantsTabState extends State<PlantsTab>
                 child: Stack(
                   children: [
                     // Left crop
-                    Positioned(top: 25, left: 0, child: PlantBoxSkeleton()),
-                    Positioned(top: 0, right: 0, child: PlantBoxSkeleton()),
+                    // Positioned(top: 25, left: 0, child: PlantBoxSkeleton()),
+                    // Positioned(top: 0, right: 0, child: PlantBoxSkeleton()),
                     AddCropButton(),
                   ],
                 ),

@@ -98,7 +98,7 @@ class _LoginPageState extends State<LoginPage> {
                   keyboardType: TextInputType.visiblePassword,
                   autofillHints: [AutofillHints.password],
                 ),
-                SizedBox(height: screenHeight / 5.5),
+                SizedBox(height: screenHeight / 10),
                 ElevatedButton(
                   onPressed: _submit,
                   style: ElevatedButton.styleFrom(
@@ -200,30 +200,30 @@ class _SignUpPageState extends State<SignUpPage> {
     }
 
     // show the loading dialog
-    showDialog(
-      barrierDismissible: false,
-      context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: AppColors.pageBackground,
-        content: Column(
-          spacing: 10.0,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Lottie.asset('assets/animations/IoTloading.json'),
-            Text(
-              'Registering...',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontFamily: 'Zen Kaku Gothic Antique',
-                fontSize: 20,
-                fontWeight: FontWeight.w900,
-                color: AppColors.primaryRed,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
+    // showDialog(
+    //   barrierDismissible: false,
+    //   context: context,
+    //   builder: (context) => AlertDialog(
+    //     backgroundColor: AppColors.pageBackground,
+    //     content: Column(
+    //       spacing: 10.0,
+    //       mainAxisSize: MainAxisSize.min,
+    //       children: [
+    //         Lottie.asset('assets/animations/IoTloading.json'),
+    //         Text(
+    //           'Registering...',
+    //           textAlign: TextAlign.center,
+    //           style: TextStyle(
+    //             fontFamily: 'Zen Kaku Gothic Antique',
+    //             fontSize: 20,
+    //             fontWeight: FontWeight.w900,
+    //             color: AppColors.primaryRed,
+    //           ),
+    //         ),
+    //       ],
+    //     ),
+    //   ),
+    // );
 
     try {
       await Auth().createUserWithEmailAndPassword(
@@ -238,7 +238,7 @@ class _SignUpPageState extends State<SignUpPage> {
 
       final myBox = Hive.box('farmulanDB');
       await myBox.put('firstName', firstNameController.text.trim());
-      await myBox.put('LastName', lastNameController.text.trim());
+      await myBox.put('lastName', lastNameController.text.trim());
 
       Get.to(() => MyNavBar());
     } on FirebaseAuthException catch (e) {
@@ -284,14 +284,14 @@ class _SignUpPageState extends State<SignUpPage> {
               children: [
                 SizedBox(height: screenHeight / 35),
                 SizedBox(
-                  width: screenWidth / 1.8,
-                  height: screenWidth / 1.8,
+                  width: screenWidth / 2,
+                  height: screenWidth / 2,
                   child: Lottie.asset('assets/animations/updatedWindmill.json'),
                 ),
                 Text(
                   'Getting Started',
                   style: TextStyle(
-                    fontSize: 35,
+                    fontSize: 30,
                     fontWeight: FontWeight.w800,
                     color: AppColors.pageBackground,
                   ),
@@ -341,9 +341,9 @@ class _SignUpPageState extends State<SignUpPage> {
                   controller: confirmPasswordController,
                   keyboardType: TextInputType.visiblePassword,
                 ),
-                SizedBox(height: 10),
+                SizedBox(height: 5),
                 Row(
-                  spacing: 8,
+                  spacing: 2,
                   children: [
                     Checkbox(
                       value: isChecked,
@@ -362,14 +362,14 @@ class _SignUpPageState extends State<SignUpPage> {
                     Text(
                       'By checking the box you agree to our Terms and Conditions',
                       style: TextStyle(
-                        fontSize: 12,
+                        fontSize: 10,
                         fontWeight: FontWeight.normal,
                         color: AppColors.pageBackground,
                       ),
                     ),
                   ],
                 ),
-                SizedBox(height: screenHeight / 15),
+                SizedBox(height: 10),
                 ElevatedButton(
                   onPressed: _submit,
                   style: ElevatedButton.styleFrom(
@@ -465,7 +465,7 @@ class _AuthFormFieldState extends State<AuthFormField> {
   final BorderRadius br = BorderRadius.circular(10);
   @override
   Widget build(BuildContext context) {
-    double inputWidth = MediaQuery.of(context).size.width / 1.11;
+    double inputWidth = MediaQuery.of(context).size.width / 1.2;
     return Container(
       width: inputWidth,
       decoration: BoxDecoration(
@@ -511,7 +511,7 @@ class _AuthFormFieldState extends State<AuthFormField> {
           ),
           border: OutlineInputBorder(),
           labelText: widget.fieldName,
-          contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+          contentPadding: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
           // The default border (when not focused)
           enabledBorder: OutlineInputBorder(
             borderRadius: br, // corner radius
