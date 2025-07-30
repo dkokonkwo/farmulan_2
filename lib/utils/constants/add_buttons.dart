@@ -12,7 +12,8 @@ import 'colors.dart';
 import 'icons.dart';
 
 class AddCropButton extends StatefulWidget {
-  const AddCropButton({super.key});
+  final VoidCallback onCropAdded;
+  const AddCropButton({super.key, required this.onCropAdded});
 
   @override
   State<AddCropButton> createState() => _AddCropButtonState();
@@ -44,8 +45,10 @@ class _AddCropButtonState extends State<AddCropButton> {
       // You can now use `stages` locally if needed, or just trust that it got written server‑side.
     } on FirebaseFunctionsException catch (e) {
       showErrorToast(context, 'Error building crop stages: ${e.message}');
+      print(e);
     } catch (e) {
       showErrorToast(context, 'Unknown error building stages: $e');
+      print(e);
     }
   }
 
@@ -125,6 +128,8 @@ class _AddCropButtonState extends State<AddCropButton> {
       if (isGrowing) {
         await _buildStages(farmId, cropId);
       }
+
+      widget.onCropAdded();
 
       final newCropHive = {
         'cropId': cropId,

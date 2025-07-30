@@ -124,7 +124,10 @@ async function fetchElevation(lat: number, lon: number) {
 
 // daily schedule
 export const scheduledMeteorUpdate = onSchedule(
-  "every day 00:00",
+  {
+    schedule: "0 0,8,16 * * *", // This is the correct cron syntax
+    timeZone: "Africa/Kigali", // Specify your timezone for accurate scheduling
+  },
   async (event: ScheduledEvent) => {
     // <--- Event type for scheduled functions is 'ScheduleEvent'
     logger.log("Starting scheduledMeteorUpdate...");

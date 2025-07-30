@@ -113,71 +113,74 @@ class _NeumorphicButtonState extends State<NeumorphicButton> {
 void showInfoDialog(BuildContext context, PlantInfo plantInfo) {
   showDialog<String>(
     context: context,
-    builder: (BuildContext context) => AlertDialog(
-      backgroundColor: AppColors.pageBackground,
-      title: Row(
-        spacing: 10,
-        children: [
-          Icon(AppIcons.leaf, color: AppColors.regularText),
-          Text(
-            plantInfo.name,
-            style: TextStyle(
-              fontFamily: 'Zen Kaku Gothic Antique',
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: AppColors.regularText,
+    builder: (BuildContext context) => Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: AlertDialog(
+        backgroundColor: AppColors.pageBackground,
+        title: Row(
+          spacing: 10,
+          children: [
+            Icon(AppIcons.leaf, color: AppColors.regularText),
+            Text(
+              plantInfo.name,
+              style: TextStyle(
+                fontFamily: 'Zen Kaku Gothic Antique',
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: AppColors.regularText,
+              ),
             ),
-          ),
-        ],
-      ),
-      content: Row(
-        children: [
-          ShaderMask(
-            shaderCallback: (bounds) => LinearGradient(
-              colors: [AppColors.primaryPurple, AppColors.primaryRed],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ).createShader(bounds),
-            blendMode: BlendMode.srcIn,
-            child: Icon(AppIcons.watch),
-          ),
-          SizedBox(width: 7),
+          ],
+        ),
+        content: Row(
+          children: [
+            ShaderMask(
+              shaderCallback: (bounds) => LinearGradient(
+                colors: [AppColors.primaryPurple, AppColors.primaryRed],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ).createShader(bounds),
+              blendMode: BlendMode.srcIn,
+              child: Icon(AppIcons.watch),
+            ),
+            SizedBox(width: 5),
+            Text(
+              'Growth Stage',
+              style: TextStyle(
+                fontFamily: 'Zen Kaku Gothic Antique',
+                fontSize: 15,
+                fontWeight: FontWeight.bold,
+                color: AppColors.regularText.withValues(alpha: 0.5),
+              ),
+            ),
+            SizedBox(width: 10),
+            Text(
+              growthStages[plantInfo.plantStage],
+              style: TextStyle(
+                fontFamily: 'Zen Kaku Gothic Antique',
+                fontSize: 15,
+                fontWeight: FontWeight.bold,
+                color: AppColors.regularText.withValues(alpha: 0.7),
+                fontStyle: FontStyle.italic,
+              ),
+            ),
+          ],
+        ),
+        actions: <Widget>[
           Text(
-            'Growth Stage',
+            plantInfo.isGrowing
+                ? 'Planted ${plantInfo.timeOfPlant} days ago'
+                : 'Not planted',
             style: TextStyle(
               fontFamily: 'Zen Kaku Gothic Antique',
               fontSize: 15,
               fontWeight: FontWeight.bold,
-              color: AppColors.regularText.withValues(alpha: 0.5),
-            ),
-          ),
-          SizedBox(width: 15),
-          Text(
-            growthStages[plantInfo.plantStage],
-            style: TextStyle(
-              fontFamily: 'Zen Kaku Gothic Antique',
-              fontSize: 17,
-              fontWeight: FontWeight.bold,
-              color: AppColors.regularText.withValues(alpha: 0.7),
+              color: AppColors.regularText,
               fontStyle: FontStyle.italic,
             ),
           ),
         ],
       ),
-      actions: <Widget>[
-        Text(
-          plantInfo.isGrowing
-              ? 'Planted ${plantInfo.timeOfPlant} days ago'
-              : 'Not planted',
-          style: TextStyle(
-            fontFamily: 'Zen Kaku Gothic Antique',
-            fontSize: 15,
-            fontWeight: FontWeight.bold,
-            color: AppColors.regularText,
-            fontStyle: FontStyle.italic,
-          ),
-        ),
-      ],
     ),
   );
 }

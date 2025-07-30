@@ -2,6 +2,7 @@
 
 import 'package:farmulan/authentication/welcome_onboarding.dart';
 import 'package:farmulan/utils/constants/navigation.dart';
+import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -13,6 +14,10 @@ void main() async {
   final widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
+  // --- Prevent the HighlightModeManager trying to setState on disposed widgets
+  FocusManager.instance.highlightStrategy =
+      FocusHighlightStrategy.alwaysTraditional;
+
   try {
     await Hive.initFlutter();
     var box = await Hive.openBox('farmulanDB');
@@ -21,7 +26,17 @@ void main() async {
     print('Hive init error: $e');
   }
 
-  await Firebase.initializeApp();
+  try {
+    await Firebase.initializeApp();
+
+    await FirebaseAppCheck.instance.activate(
+      androidProvider: AndroidProvider.debug,
+      // For iOS: iosProvider: IosProvider.appAttest,
+      // webProvider: ReCaptchaV3Provider('your-site-key'), // if you're using web
+    );
+  } catch (e) {
+    print('Firebase init or App Check error: $e');
+  }
 
   FlutterNativeSplash.remove();
 

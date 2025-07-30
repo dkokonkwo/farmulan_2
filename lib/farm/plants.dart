@@ -178,7 +178,7 @@ class _PlantsTabState extends State<PlantsTab>
     setState(() {
       _isLoadingInitialData = true;
     });
-    _loadCrops().then((_) {
+    loadCrops().then((_) {
       // Once _loadCrops completes (successfully or with error), set loading to false
       setState(() {
         _isLoadingInitialData = false;
@@ -220,7 +220,7 @@ class _PlantsTabState extends State<PlantsTab>
     await box.put('farmId', farmId);
   }
 
-  Future<void> _loadCrops() async {
+  Future<void> loadCrops() async {
     final box = Hive.box('farmulanDB');
     final farmId = box.get('farmId') as String?;
     final user = Auth().currentUser;
@@ -343,7 +343,7 @@ class _PlantsTabState extends State<PlantsTab>
             child: Center(
               child:
                   // Left crop
-                  AddCropButton(),
+                  AddCropButton(onCropAdded: loadCrops),
             ),
           ),
         ],
@@ -368,10 +368,9 @@ class _PlantsTabState extends State<PlantsTab>
                 width: width,
                 child: Stack(
                   children: [
-                    // Left crop
                     // Positioned(top: 25, left: 0, child: PlantBoxSkeleton()),
                     // Positioned(top: 0, right: 0, child: PlantBoxSkeleton()),
-                    AddCropButton(),
+                    AddCropButton(onCropAdded: loadCrops),
                   ],
                 ),
               ),
@@ -437,7 +436,7 @@ class _PlantsTabState extends State<PlantsTab>
                 ),
               ),
             // Always show option to add button
-            AddCropButton(),
+            AddCropButton(onCropAdded: loadCrops),
           ],
         );
       },

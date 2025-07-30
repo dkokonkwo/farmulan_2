@@ -51,6 +51,7 @@ dependencies:
   cloud_firestore:
   firebase_storage:
   cloud_functions:
+  firebase_app_check:
 
   #----IMAGE PICKER----#
   image_picker:

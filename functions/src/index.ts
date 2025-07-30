@@ -183,9 +183,9 @@ export const buildCropStages = onCall(async (request) => {
     [];
 
   const cropName = crop.name.toLowerCase();
-  if (cropName === "tomato") {
+  if (cropName === "tomatoes") {
     stages = buildTomato(plantingDayOfYear);
-  } else if (crop.name.toLowercase() === "lettuce") {
+  } else if (cropName === "lettuce") {
     stages = buildLettuce(plantingDayOfYear);
   } else {
     throw new HttpsError("invalid-argument", `unsupported crop: ${crop.name}`);

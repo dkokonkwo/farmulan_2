@@ -36,6 +36,8 @@ class _CropBottomSheetState extends State<CropBottomSheet> {
   @override
   void initState() {
     super.initState();
+    cropNameCtrl = TextEditingController();
+    plantedTimeCtrl = TextEditingController();
     _loadCrop();
   }
 

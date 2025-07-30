@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:farmulan/farm/bottom_buttons.dart';
 import 'package:farmulan/farm/plant_data.dart';
 import 'package:farmulan/farm/plants.dart';
@@ -5,9 +7,13 @@ import 'package:farmulan/farm/sensor_tabs.dart';
 import 'package:farmulan/farm/toggle_chart.dart';
 import 'package:farmulan/utils/constants/colors.dart';
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
+import 'package:http/http.dart' as http;
 import 'package:lottie/lottie.dart';
 
+import '../authentication/auth.dart';
 import '../utils/constants/plant_details_appbar.dart';
+import '../utils/constants/toasts.dart';
 
 class PlantDetails extends StatefulWidget {
   final PlantInfo data;
@@ -19,10 +25,102 @@ class PlantDetails extends StatefulWidget {
 
 class _PlantDetailsState extends State<PlantDetails> {
   int currentIndex = 0;
+  bool _isOn = false;
+  final box = Hive.box('farmulanDB');
+  static const _irrigateNode = 'irrigate.json';
 
   void toggleButton(int index) {
     setState(() {
       currentIndex = index;
+    });
+  }
+
+  Future<void> waterOn() async {
+    final user = Auth().currentUser;
+    if (user == null) {
+      showErrorToast(context, 'User not signed in');
+      return;
+    }
+
+    final farmId = box.get('farmId') as String? ?? '';
+    final cropId = widget.data.cropId;
+    if (farmId.isEmpty || cropId.isEmpty) {
+      showErrorToast(context, 'No farmId or cropId');
+      return;
+    }
+
+    final uri = Uri.parse(
+      'https://iot-farminc-default-rtdb.firebaseio.com'
+      '/users/${user.uid}'
+      '/farms/$farmId'
+      '/crops/$cropId'
+      '/$_irrigateNode',
+    );
+
+    try {
+      // Use PUT and send a raw JSON string "ON"
+      final response = await http.put(
+        uri,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode("ON"),
+      );
+      if (response.statusCode != 200) {
+        throw Exception(
+          'Failed to send irrigation ON (status ${response.statusCode}): ${response.body}',
+        );
+      }
+    } catch (e) {
+      if (!mounted) return;
+      showErrorToast(context, 'Could not send ON command: $e');
+      return;
+    }
+
+    setState(() {
+      _isOn = true;
+    });
+  }
+
+  Future<void> waterOff() async {
+    final user = Auth().currentUser;
+    if (user == null) {
+      showErrorToast(context, 'User not signed in');
+      return;
+    }
+
+    final farmId = box.get('farmId') as String? ?? '';
+    final cropId = widget.data.cropId;
+    if (farmId.isEmpty || cropId.isEmpty) {
+      showErrorToast(context, 'No farmId or cropId');
+      return;
+    }
+
+    final uri = Uri.parse(
+      'https://iot-farminc-default-rtdb.firebaseio.com'
+      '/users/${user.uid}'
+      '/farms/$farmId'
+      '/crops/$cropId'
+      '/$_irrigateNode',
+    );
+
+    try {
+      final response = await http.put(
+        uri,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode("OFF"),
+      );
+      if (response.statusCode != 200) {
+        throw Exception(
+          'Failed to send irrigation OFF (status ${response.statusCode}): ${response.body}',
+        );
+      }
+    } catch (e) {
+      if (!mounted) return;
+      showErrorToast(context, 'Could not send OFF command: $e');
+      return;
+    }
+
+    setState(() {
+      _isOn = false;
     });
   }
 
@@ -58,6 +156,65 @@ class _PlantDetailsState extends State<PlantDetails> {
                         ),
                       ],
                     ),
+                    SizedBox(height: 15),
+                    currentIndex == 3
+                        ? Row(
+                            mainAxisSize: MainAxisSize.min,
+                            spacing: 20,
+                            children: [
+                              ElevatedButton(
+                                onPressed: waterOn,
+                                style: ElevatedButton.styleFrom(
+                                  elevation: 0.0,
+                                  shadowColor: Colors.transparent,
+                                  backgroundColor: AppColors.primaryRed,
+                                  fixedSize: Size(screenWidth / 2.5, 57),
+                                  padding: EdgeInsets.symmetric(vertical: 12),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                ),
+                                child: Text(
+                                  'Run Irrigation',
+                                  style: TextStyle(
+                                    fontFamily: 'Zen Kaku Gothic Antique',
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    color: AppColors.pageBackground,
+                                  ),
+                                ),
+                              ),
+                              (_isOn ?? false)
+                                  ? ElevatedButton(
+                                      onPressed: waterOff,
+                                      style: ElevatedButton.styleFrom(
+                                        elevation: 0.0,
+                                        shadowColor: Colors.transparent,
+                                        backgroundColor: AppColors.primaryRed,
+                                        fixedSize: Size(screenWidth / 2.5, 57),
+                                        padding: EdgeInsets.symmetric(
+                                          vertical: 12,
+                                        ),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            10,
+                                          ),
+                                        ),
+                                      ),
+                                      child: Text(
+                                        'Turn Off Irrigation',
+                                        style: TextStyle(
+                                          fontFamily: 'Zen Kaku Gothic Antique',
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.bold,
+                                          color: AppColors.pageBackground,
+                                        ),
+                                      ),
+                                    )
+                                  : SizedBox.shrink(),
+                            ],
+                          )
+                        : SizedBox.shrink(),
                   ],
                 ),
               ),

@@ -126,11 +126,17 @@ class _WeatherAPIDataState extends State<WeatherAPIData> {
   double temp = 0.0;
   String icon = '';
   String description = '';
+  static const _kLastFetchKey = 'lastWeatherFetch';
+  static const _kCacheKey = 'weatherDataCache';
 
   @override
   void initState() {
     super.initState();
     // _fetchWeather();
+    // once the widget is mounted, check-and-fetch
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _maybeFetchWeather();
+    });
   }
 
   Future<void> _setCityAndCountry(String city, String country) async {
@@ -184,7 +190,36 @@ class _WeatherAPIDataState extends State<WeatherAPIData> {
     }
   }
 
-  Future<void> _fetchWeather() async {
+  Future<void> _maybeFetchWeather() async {
+    // read last-run from Hive (stored as milliseconds since epoch)
+    final _myBox = Hive.box('farmulanDB');
+    final int? lastMillis = _myBox.get(_kLastFetchKey) as int?;
+    final now = DateTime.now();
+
+    if (lastMillis != null) {
+      final lastRun = DateTime.fromMillisecondsSinceEpoch(lastMillis);
+      final difference = now.difference(lastRun);
+
+      // if it's been less than 30 minutes, bail out
+      if (difference < const Duration(hours: 1)) {
+        debugPrint('Using cached weather data');
+        await _fetchFromHiveBackup();
+        return;
+      }
+    }
+
+    // otherwise, do the fetch and update the timestamp
+    final success = await _fetchWeather();
+    if (success) {
+      await _myBox.put(_kLastFetchKey, now.millisecondsSinceEpoch);
+    } else {
+      // if fetch failed, fall back to cache
+      await _fetchFromHiveBackup();
+    }
+  }
+
+  Future<bool> _fetchWeather() async {
+    final box = Hive.box('farmulanDB');
     final uri = Uri.parse('https://fetchweather-e4ldvx4z3a-uc.a.run.app');
     try {
       final response = await http.post(
@@ -198,21 +233,57 @@ class _WeatherAPIDataState extends State<WeatherAPIData> {
         );
       }
       final data = json.decode(response.body) as Map<String, dynamic>;
-      if (!mounted) return;
+      // extract fields
+      final cached = <String, dynamic>{
+        'country': data['sys']['country'],
+        'city': data['name'],
+        'humidity': data['main']['humidity'],
+        'wind': (data['wind']['speed'] as num) * 3.6,
+        'temp': (data['main']['temp'] as num) - 273.15,
+        'description': data['weather'][0]['description'],
+        'icon': data['weather'][0]['icon'],
+      };
+
+      if (!mounted) return false;
       setState(() {
-        country = data['sys']['country'];
-        city = data['name'];
-        humidity = data['main']['humidity'];
-        wind = (data['wind']['speed'] as num) * 3.6;
-        temp = (data['main']['temp'] as num) - 273.15;
-        description = data['weather'][0]['description'];
-        icon = data['weather'][0]['icon'];
+        country = cached['country'];
+        city = cached['city'];
+        humidity = cached['humidity'];
+        wind = cached['wind'];
+        temp = cached['temp'];
+        description = cached['description'];
+        icon = cached['icon'];
       });
+
+      // save into Hive cache
+      await box.put(_kCacheKey, cached);
+
       await _setCityAndCountry(city, country);
+      return true;
     } catch (e) {
-      if (!mounted) return;
+      if (!mounted) return false;
       showErrorToast(context, 'Could not load weather: $e');
+      return false;
     }
+  }
+
+  Future<void> _fetchFromHiveBackup() async {
+    final box = Hive.box('farmulanDB');
+    final cached = box.get(_kCacheKey) as Map<String, dynamic>?;
+    if (cached == null) {
+      debugPrint('No weather cache available');
+      return;
+    }
+    if (!mounted) return;
+    setState(() {
+      country = cached['country'] as String;
+      city = cached['city'] as String;
+      humidity = cached['humidity'] as int;
+      wind = cached['wind'] as double;
+      temp = cached['temp'] as double;
+      description = cached['description'] as String;
+      icon = cached['icon'] as String;
+    });
   }
 
   @override
