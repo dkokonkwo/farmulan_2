@@ -24,6 +24,7 @@ class _PlantDetailsAppBarState extends State<PlantDetailsAppBar> {
   Widget build(BuildContext context) {
     return AppBar(
       toolbarHeight: 80,
+      surfaceTintColor: AppColors.pageBackground,
       backgroundColor: AppColors.pageBackground,
       centerTitle: true,
       leading: Center(

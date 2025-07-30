@@ -182,6 +182,7 @@ class _SignUpPageState extends State<SignUpPage> {
   final confirmPasswordController = TextEditingController();
   final firstNameController = TextEditingController();
   final lastNameController = TextEditingController();
+  bool _isLoading = false;
 
   Future<void> _submit() async {
     if (!isChecked) {
@@ -198,6 +199,10 @@ class _SignUpPageState extends State<SignUpPage> {
       ).showSnackBar(const SnackBar(content: Text('Password does not match')));
       return;
     }
+
+    setState(() {
+      _isLoading = true;
+    });
 
     // show the loading dialog
     // showDialog(
@@ -239,19 +244,23 @@ class _SignUpPageState extends State<SignUpPage> {
       final myBox = Hive.box('farmulanDB');
       await myBox.put('firstName', firstNameController.text.trim());
       await myBox.put('lastName', lastNameController.text.trim());
+      setState(() {
+        _isLoading = false;
+      });
 
-      Get.to(() => MyNavBar());
+      Get.offAll(() => MyNavBar());
     } on FirebaseAuthException catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
       if (!mounted) return;
       showErrorToast(context, 'Registration failed: ${e.message}');
     } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
       if (!mounted) return;
       showErrorToast(context, 'An unexpected error occurred: $e');
-    } finally {
-      // always dismiss the loading dialog
-      if (mounted) {
-        Navigator.of(context, rootNavigator: true).pop();
-      }
     }
   }
 
@@ -384,14 +393,18 @@ class _SignUpPageState extends State<SignUpPage> {
                       mainAxisSize: MainAxisSize.min,
                       spacing: 8,
                       children: [
-                        Text(
-                          'Next',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.primary,
-                          ),
-                        ),
+                        _isLoading
+                            ? CircularProgressIndicator(
+                                color: AppColors.primaryPurple,
+                              )
+                            : Text(
+                                'Next',
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColors.primary,
+                                ),
+                              ),
                         Icon(AppIcons.rightArrow, color: AppColors.primary),
                       ],
                     ),

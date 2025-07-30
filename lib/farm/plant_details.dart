@@ -39,9 +39,9 @@ class _PlantDetailsState extends State<PlantDetails> {
               child: Center(
                 child: Column(
                   children: [
-                    SizedBox(height: 50),
+                    SizedBox(height: 20),
                     ToggleChart(),
-                    SizedBox(height: 40),
+                    SizedBox(height: 20),
                     Row(
                       mainAxisSize: MainAxisSize.min,
                       spacing: 20,

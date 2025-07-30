@@ -24,14 +24,87 @@ class WeatherInfo extends StatefulWidget {
 class _WeatherInfoState extends State<WeatherInfo> {
   final _myBox = Hive.box('farmulanDB');
 
+  bool _initialized = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadFarmLocation();
+  }
+
+  Future<void> ensureFarmIdInHive() async {
+    final box = Hive.box('farmulanDB');
+    String? farmId = box.get('farmId') as String?;
+    if (farmId != null && farmId.isNotEmpty) return;
+
+    final user = Auth().currentUser;
+    if (user == null) {
+      // not signed in yet
+      return;
+    }
+
+    // fetch the first farm document under this user
+    final querySnap = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user.uid)
+        .collection('farms')
+        .limit(1)
+        .get();
+
+    if (querySnap.docs.isEmpty) {
+      // user has no farms
+      return;
+    }
+
+    farmId = querySnap.docs.first.id;
+    await box.put('farmId', farmId);
+  }
+
+  Future<void> _loadFarmLocation() async {
+    ensureFarmIdInHive();
+    // 1) Do we already have a farmId in Hive?
+    final farmId = _myBox.get('farmId') as String?;
+    if (farmId != null && farmId.isNotEmpty) {
+      final user = Auth().currentUser;
+      if (user != null) {
+        final farmDoc = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(user.uid)
+            .collection('farms')
+            .doc(farmId)
+            .get();
+
+        if (farmDoc.exists) {
+          final data = farmDoc.data()!;
+          final gp = data['coord'] as GeoPoint?;
+          if (gp != null) {
+            // store into Hive
+            await _myBox.put('location', [gp.latitude, gp.longitude]);
+          }
+        }
+      }
+    }
+    setState(() {
+      _initialized = true;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    // while we haven’t yet tried to fetch from Firestore, show a loader
+    if (!_initialized) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
     return ValueListenableBuilder(
       valueListenable: _myBox.listenable(keys: ['location']),
       builder: (context, Box b, _) {
         final loc = b.get('location', defaultValue: [0.0, 0.0]) as List<double>;
-
-        return loc[0] != 0.0 ? WeatherAPIData(coordinates: loc) : GPSLocator();
+        // if we have a non‑zero lat, show weather; otherwise fall back to GPS
+        if (loc.length == 2 && loc[0] != 0.0) {
+          return WeatherAPIData(coordinates: loc);
+        }
+        return GPSLocator();
       },
     );
   }

@@ -1,11 +1,18 @@
+/* eslint-disable camelcase */
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
+/* eslint-disable require-jsdoc */
 import {onCall, HttpsError} from "firebase-functions/v2/https";
 import * as logger from "firebase-functions/logger";
 import * as admin from "firebase-admin";
 import {fetchWeatherApi} from "openmeteo";
 import {onSchedule, ScheduledEvent} from "firebase-functions/v2/scheduler";
-// import fetch from "node-fetch";
 
-// Start writing functions
+import {
+  computeDailyIrrigation,
+  Stage,
+  ProcessedMeteorData,
+} from "./calculations";
+// import fetch from "node-fetch";
 // https://firebase.google.com/docs/functions/typescript
 admin.initializeApp();
 const db = admin.firestore();
@@ -15,22 +22,19 @@ interface GetFarmDataRequest {
   farmId: string;
 }
 
-// interface GetFarmDataResponse {
-//   elevation: number;
-// }
-
-interface ProcessedMeteorData {
-  tMax: number;
-  tMin: number;
-  sunshineDuration: number;
-  daylightDuration: number;
-  rhMax: number;
-  rhMin: number;
-  windSpeed: number; // This is averageWindSpeed
-  height: number; // Fixed at 10 in your code
-  latitude: number;
-  longitude: number;
+interface SoilProfile {
+  θ_fc: number; // field capacity [m³/m³]
+  θ_wp: number; // wilting point  [m³/m³]
+  Zr: number; // root depth [mm]
+  p: number; // allowable depletion fraction (e.g. 0.5)
 }
+
+const soil: SoilProfile = {
+  θ_fc: 0.3, // e.g. sandy loam
+  θ_wp: 0.15,
+  Zr: 300, // mm
+  p: 0.5, // let it dry to 50% of TAW
+};
 
 export const getFarmData = onCall<
   GetFarmDataRequest,
@@ -118,80 +122,102 @@ async function fetchElevation(lat: number, lon: number) {
   return resp.json();
 }
 
+// daily schedule
 export const scheduledMeteorUpdate = onSchedule(
   "every day 00:00",
   async (event: ScheduledEvent) => {
-    // <--- Event type for scheduled functions is 'ScheduleEvent' or 'any' if not specific
+    // <--- Event type for scheduled functions is 'ScheduleEvent'
     logger.log("Starting scheduledMeteorUpdate...");
 
-    try {
-      const usersRefs = await db.collection("users").listDocuments();
-      logger.info(`Found ${usersRefs.length} user(s).`);
+    const users = await db.collection("users").listDocuments();
+    logger.info(`Found ${users.length} user(s).`);
 
-      for (const userRef of usersRefs) {
-        const farmsRefs = await userRef.collection("farms").listDocuments();
-        logger.info(`User ${userRef.id} has ${farmsRefs.length} farm(s).`);
-
-        for (const farmRef of farmsRefs) {
-          try {
-            const farmSnap = await farmRef.get();
-            if (!farmSnap.exists) {
-              logger.warn(
-                `Farm document ${farmRef.path} does not exist, skipping.`,
-              );
-              continue;
-            }
-
-            const farm = farmSnap.data()!;
-            const coord = farm.coord as admin.firestore.GeoPoint | undefined;
-
-            if (!coord) {
-              logger.warn(`Farm ${farmRef.path} missing coord; skipping`);
-              continue;
-            }
-
-            const lat = coord.latitude;
-            const lon = coord.longitude;
-
-            if (typeof lat !== "number" || typeof lon !== "number") {
-              logger.warn(
-                `Farm ${farmRef.path} has malformed coordinates; skipping`,
-              );
-              continue;
-            }
-
-            const today = dayOfTheYear();
-
-            const meteorData = await getMeteorData(lat, lon); // Await the call
-
-            await farmRef.update({
-              "meteorData.tMax": meteorData.tMax,
-              "meteorData.tMin": meteorData.tMin,
-              "meteorData.sunshineDuration": meteorData.sunshineDuration,
-              "meteorData.sunshineDuration": meteorData.daylightDuration,
-              "meteorData.rhMax": meteorData.rhMax,
-              "meteorData.rhMin": meteorData.rhMin,
-              "meteorData.windSpeed": meteorData.windSpeed,
-              "meteorData.height": meteorData.height,
-              "meteorData.latitude": meteorData.latitude,
-              "meteorData.longitude": meteorData.longitude,
-              "meteorData.dayOfYear": today + 1,
-            });
-
-            logger.info(`Updated meteorData for farm ${farmRef.path}`);
-          } catch (farmError: any) {
-            logger.error(`Error processing farm ${farmRef.path}:`, farmError);
+    for (const userRef of users) {
+      const farms = await userRef.collection("farms").listDocuments();
+      for (const farmRef of farms) {
+        try {
+          const farmSnap = await farmRef.get();
+          if (!farmSnap.exists) continue;
+          const farm = farmSnap.data()!;
+          const coord = farm.coord as admin.firestore.GeoPoint | undefined;
+          if (!coord) {
+            logger.warn(`Farm ${farmRef.path} missing coord; skipping`);
+            continue;
           }
+
+          const meteorData = await getMeteorData(
+            coord.latitude,
+            coord.longitude,
+          );
+          await farmRef.update({meteorData});
+          logger.info(`Updated meteorData for farm ${farmRef.path}`);
+
+          const cropRefs = await farmRef.collection("crops").listDocuments();
+          await setIrrigationSchedule(cropRefs, meteorData);
+        } catch (err) {
+          logger.error(`Farm ${farmRef.path} error`, err);
         }
       }
-      logger.log("ScheduledMeteorUpdate completed successfully.");
-    } catch (mainError: any) {
-      logger.error("Error in scheduledMeteorUpdate main loop:", mainError);
-      throw mainError;
     }
+    logger.log("ScheduledMeteorUpdate completed successfully.");
   },
 );
 
+async function setIrrigationSchedule(
+  cropRefs: FirebaseFirestore.DocumentReference[],
+  meteorData: ProcessedMeteorData,
+): Promise<void> {
+  for (const cropRef of cropRefs) {
+    try {
+      const snap = await cropRef.get();
+      if (!snap.exists) {
+        logger.warn(`Crop document ${cropRef.path} does not exist, skipping.`);
+        continue;
+      }
+
+      const crop = snap.data()!;
+      const stages = crop.stages as Stage[];
+      const θ_current = crop.soilMoisture as number;
+
+      if (!stages || θ_current == null) {
+        logger.warn(
+          `Crop ${cropRef.path} missing stages or soil moisture value; skipping`,
+        );
+        continue;
+      }
+
+      const {ETo, ETc, IR} = await computeDailyIrrigation(meteorData, stages);
+
+      await cropRef.update({ETo, ETc, IR});
+
+      const IE = 0.75; // sprinklers at 75% efficiency
+
+      const daysToIrrigate = daysUntilIrrigation(soil, θ_current, ETc);
+      if (daysToIrrigate === 0) {
+        // start irrigation now:
+        // send start to microcontroller
+        const waterDepth = irrigationDepth(soil, θ_current, IE);
+        logger.info(
+          `Irrigate today with ${waterDepth.toFixed(1)} mm of water.`,
+        );
+        await cropRef.update({
+          irrigating: true,
+          waterDepth,
+          lastIrrigated: admin.firestore.FieldValue.serverTimestamp(),
+        });
+      } else {
+        await cropRef.update({
+          irrigating: false,
+          nextIrrigation: daysToIrrigate.toFixed(1),
+        });
+        logger.info(`Irrigation in ~${daysToIrrigate.toFixed(1)} days.`);
+      }
+      logger.info(`Updated updated irrigation schedule for ${cropRef.path}`);
+    } catch (cropError: any) {
+      logger.error(`Error scheduling crop ${cropRef.path}:`, cropError);
+    }
+  }
+}
 
 /**
  * Calculates day of year.
@@ -199,10 +225,8 @@ export const scheduledMeteorUpdate = onSchedule(
  */
 function dayOfTheYear(): number {
   const today = new Date();
-  return Math.ceil(
-    (today.getTime() - new Date(today.getFullYear(), 0, 1).getTime()) /
-      86400000,
-  );
+  const start = new Date(today.getFullYear(), 0, 1);
+  return Math.ceil((today.getTime() - start.getTime()) / 86400000);
 }
 
 /**
@@ -225,14 +249,15 @@ async function getMeteorData(
       "sunshine_duration",
       "wind_speed_10m_max",
       "daylight_duration",
+      "precipitation_sum",
     ],
     hourly: ["temperature_2m", "relative_humidity_2m", "wind_speed_10m"],
     current: ["temperature_2m", "relative_humidity_2m", "wind_speed_10m"],
     timezone: "auto",
     forecast_days: 1,
   };
-
   const url = "https://api.open-meteo.com/v1/forecast";
+
   let responses: any;
   try {
     responses = await fetchWeatherApi(url, params);
@@ -248,7 +273,6 @@ async function getMeteorData(
   // Process first location. Add a for-loop for multiple locations or weather models
   const response = responses[0];
 
-  // Attributes for timezone and location
   const utcOffsetSeconds = response.utcOffsetSeconds();
 
   const current = response.current()!;
@@ -259,9 +283,9 @@ async function getMeteorData(
   const weatherData = {
     current: {
       time: new Date((Number(current.time()) + utcOffsetSeconds) * 1000),
-      temperature2m: current.variables(0)!.value(),
-      relativeHumidity2m: current.variables(1)!.value(),
-      windSpeed10m: current.variables(2)!.value(),
+      temperature_2m: current.variables(0)!.value(),
+      relative_humidity_2m: current.variables(1)!.value(),
+      wind_speed_10m: current.variables(2)!.value(),
     },
     hourly: {
       time: [
@@ -276,9 +300,9 @@ async function getMeteorData(
               1000,
           ),
       ),
-      temperature2m: hourly.variables(0)!.valuesArray()!,
-      relativeHumidity2m: hourly.variables(1)!.valuesArray()!,
-      windSpeed10m: hourly.variables(2)!.valuesArray()!,
+      temperature_2m: hourly.variables(0)!.valuesArray(),
+      relative_humidity_2m: hourly.variables(1)!.valuesArray(),
+      wind_speed_10m: hourly.variables(2)!.valuesArray(),
     },
     daily: {
       time: [
@@ -288,33 +312,34 @@ async function getMeteorData(
       ].map(
         (_, i) =>
           new Date(
-            (Number(daily.time()) + i * daily.interval() + utcOffsetSeconds) *
+            (Number(daily.time()) + i * hourly.interval() + utcOffsetSeconds) *
               1000,
           ),
       ),
-      temperature2mMax: daily.variables(0)!.valuesArray()!,
-      temperature2mMin: daily.variables(1)!.valuesArray()!,
-      sunshineDuration: daily.variables(2)!.valuesArray()!,
-      windSpeed10mMax: daily.variables(3)!.valuesArray()!,
-      daylightDuration: daily.variables(4)!.valuesArray()!,
+      temperature_2m_max: daily.variables(0)!.valuesArray(),
+      temperature_2m_min: daily.variables(1)!.valuesArray(),
+      sunshine_duration: daily.variables(2)!.valuesArray(),
+      wind_speed_10m_max: daily.variables(3)!.valuesArray(),
+      daylight_duration: daily.variables(4)!.valuesArray(),
+      precipitation_sum: daily.variables(5)!.valuesArray(),
     },
   };
 
   // Calculate the average wind speed, max humidity and min humidity for first day forecast
   let totalSpeed = 0;
   let minHumidity =
-    weatherData.hourly.relativeHumidity2m.length > 0 ?
-      weatherData.hourly.relativeHumidity2m[0] :
+    weatherData.hourly.relative_humidity_2m.length > 0 ?
+      weatherData.hourly.relative_humidity_2m[0] :
       101;
   let maxHumidity =
-    weatherData.hourly.relativeHumidity2m.length > 0 ?
-      weatherData.hourly.relativeHumidity2m[0] :
+    weatherData.hourly.relative_humidity_2m.length > 0 ?
+      weatherData.hourly.relative_humidity_2m[0] :
       -1;
 
-  if (weatherData.hourly.relativeHumidity2m.length > 0) {
+  if (weatherData.hourly.relative_humidity_2m.length > 0) {
     for (let i = 0; i < weatherData.hourly.time.length; i++) {
-      totalSpeed += weatherData.hourly.windSpeed10m[i];
-      const currentHumValue = weatherData.hourly.relativeHumidity2m[i];
+      totalSpeed += weatherData.hourly.wind_speed_10m[i];
+      const currentHumValue = weatherData.hourly.relative_humidity_2m[i];
       minHumidity =
         currentHumValue < minHumidity ? currentHumValue : minHumidity;
       maxHumidity =
@@ -322,25 +347,67 @@ async function getMeteorData(
     }
   } else {
     logger.warn("No hourly humidity data found.");
-    // Decide how to handle this: throw an error, return default values, etc.
-    // For now, let's set default or indicate an error.
-    // Or ensure the loop below handles empty array gracefully
   }
 
   const averageWindSpeed = totalSpeed / (weatherData.hourly.time.length || 1);
 
+  const elevationResp = await fetchElevation(lat, lon);
+  const elevation = Array.isArray(elevationResp.elevation) ?
+    elevationResp.elevation[0] :
+    undefined;
+
   const i = 0; // first day forecast
   const meteorData = {
-    tMax: weatherData.daily.temperature2mMax[i],
-    tMin: weatherData.daily.temperature2mMax[i],
-    sunshineDuration: weatherData.daily.sunshineDuration[i],
-    daylightDuration: weatherData.daily.daylightDuration[i],
+    tMax: weatherData.daily.temperature_2m_max[i],
+    tMin: weatherData.daily.temperature_2m_min[i],
+    sunshineDuration: weatherData.daily.sunshine_duration[i],
+    daylightDuration: weatherData.daily.daylight_duration[i],
+    rainfall: weatherData.daily.precipitation_sum[i],
     rhMax: maxHumidity,
     rhMin: minHumidity,
     windSpeed: averageWindSpeed,
     height: 10,
     latitude: lat,
     longitude: lon,
+    dayOfYear: dayOfTheYear(),
+    elevation: elevation,
   };
   return meteorData;
+}
+
+function daysUntilIrrigation(
+  soil: SoilProfile,
+  θ_current: number, // current volumetric moisture [m³/m³]
+  ETc: number, // crop evapotranspiration [mm/day]
+): number {
+  // Total available water (TAW) [mm]
+  const TAW = (soil.θ_fc - soil.θ_wp) * soil.Zr;
+
+  // Maximum allowable depletion Dr_max [mm]
+  const Dr_max = soil.p * TAW;
+
+  // Current water in root zone Su [mm]
+  const Su = (θ_current - soil.θ_wp) * soil.Zr;
+
+  // Threshold water remaining before irrigation
+  const Su_threshold = TAW - Dr_max;
+
+  if (Su <= Su_threshold) {
+    return 0; // irrigate today
+  }
+
+  // Days until Su falls to threshold at rate ETc per day
+  return (Su - Su_threshold) / ETc;
+}
+
+function irrigationDepth(
+  soil: SoilProfile,
+  θ_current: number,
+  IE: number, // irrigation efficiency (0–1)
+): number {
+  // Water needed to refill to FC
+  const depthToFC = (soil.θ_fc - θ_current) * soil.Zr;
+
+  // Adjust for system efficiency
+  return depthToFC / IE;
 }

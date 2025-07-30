@@ -17,38 +17,20 @@ class SettingsTab extends StatefulWidget {
 class _SettingsTabState extends State<SettingsTab> {
   final User? user = Auth().currentUser;
 
-  final List<String> titles = [
-    'Edit Farm Image',
-    'Your Crops',
-    'Feedback',
-    'Logout',
-  ];
+  final List<String> titles = ['Edit Farm Image', 'Your Crops'];
   final List<String> subheadings = [
     'Add or update your farm image',
     'Edit your crop details',
-    'Contact us for support',
-    'Sign out of your account',
   ];
-  final List<IconData> profileIcons = [
-    AppIcons.editImg,
-    AppIcons.tractor,
-    AppIcons.feedback,
-    AppIcons.logout,
-  ];
+  final List<IconData> profileIcons = [AppIcons.editImg, AppIcons.tractor];
 
-  final List<Widget> tiles = [
-    FarmImagePicker(),
-    CropOptions(),
-    Text('data'),
-    Text('data'),
-  ];
+  final List<Widget> tiles = [FarmImagePicker(), CropOptions()];
 
   @override
   Widget build(BuildContext context) {
     return Column(
       spacing: 8.0,
       children: List.generate(titles.length, (index) {
-        final isLogout = index == titles.length - 1;
         return ExpansionTile(
           leading: ExpansionLeadingIcon(icon: profileIcons[index]),
           title: Text(

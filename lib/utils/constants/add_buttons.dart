@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:farmulan/utils/constants/toasts.dart';
 import 'package:flutter/material.dart' hide BoxDecoration, BoxShadow;
 import 'package:flutter_inset_box_shadow/flutter_inset_box_shadow.dart';
@@ -33,6 +34,21 @@ class _AddCropButtonState extends State<AddCropButton> {
     super.dispose();
   }
 
+  Future<void> _buildStages(String farmId, String cropId) async {
+    final functions = FirebaseFunctions.instance;
+    try {
+      final HttpsCallableResult result = await functions
+          .httpsCallable('buildCropStages')
+          .call(<String, dynamic>{'farmId': farmId, 'cropId': cropId});
+      final stages = (result.data as Map<String, dynamic>)['stages'] as List;
+      // You can now use `stages` locally if needed, or just trust that it got written server‑side.
+    } on FirebaseFunctionsException catch (e) {
+      showErrorToast(context, 'Error building crop stages: ${e.message}');
+    } catch (e) {
+      showErrorToast(context, 'Unknown error building stages: $e');
+    }
+  }
+
   Future<void> _addCrop() async {
     final nameText = cropNameCtrl.text.trim();
     final timeText = plantedTimeCtrl.text.trim();
@@ -60,7 +76,9 @@ class _AddCropButtonState extends State<AddCropButton> {
       }
     }
 
-    if (mounted) setState(() => isUpdating = true);
+    setState(() {
+      isUpdating = true;
+    });
 
     try {
       final box = Hive.box('farmulanDB');
@@ -104,6 +122,10 @@ class _AddCropButtonState extends State<AddCropButton> {
           .doc(farmId)
           .update({'numOfCrops': FieldValue.increment(1)});
 
+      if (isGrowing) {
+        await _buildStages(farmId, cropId);
+      }
+
       final newCropHive = {
         'cropId': cropId,
         'name': nameText,
@@ -118,6 +140,10 @@ class _AddCropButtonState extends State<AddCropButton> {
       await box.put('crops', [...currentList, newCropHive]);
       await box.put('numOfCrops', (box.get('numOfCrops') as int? ?? 0) + 1);
 
+      setState(() {
+        isUpdating = false;
+      });
+
       // Close the dialog
       if (mounted) {
         Navigator.of(context, rootNavigator: true).pop();
@@ -126,8 +152,13 @@ class _AddCropButtonState extends State<AddCropButton> {
     } catch (e) {
       if (!mounted) return;
       showErrorToast(context, 'Failed to add crop: $e');
+      setState(() {
+        isUpdating = false;
+      });
     } finally {
-      if (mounted) setState(() => isUpdating = false);
+      setState(() {
+        isUpdating = false;
+      });
     }
   }
 

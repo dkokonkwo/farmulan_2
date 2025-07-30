@@ -192,50 +192,129 @@ class _PlantsTabState extends State<PlantsTab>
     super.dispose();
   }
 
-  Future<void> _loadCrops() async {
-    final farmId = myBox.get('farmId') as String? ?? '';
+  Future<void> ensureFarmIdInHive() async {
+    final box = Hive.box('farmulanDB');
+    String? farmId = box.get('farmId') as String?;
+    if (farmId != null && farmId.isNotEmpty) return;
 
     final user = Auth().currentUser;
-    if (user == null || farmId.isEmpty) {
+    if (user == null) {
+      // not signed in yet
+      return;
+    }
+
+    // fetch the first farm document under this user
+    final querySnap = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user.uid)
+        .collection('farms')
+        .limit(1)
+        .get();
+
+    if (querySnap.docs.isEmpty) {
+      // user has no farms
+      return;
+    }
+
+    farmId = querySnap.docs.first.id;
+    await box.put('farmId', farmId);
+  }
+
+  Future<void> _loadCrops() async {
+    final box = Hive.box('farmulanDB');
+    final farmId = box.get('farmId') as String?;
+    final user = Auth().currentUser;
+    if (farmId == null) {
+      await ensureFarmIdInHive();
+    }
+    if (user == null || farmId == null || farmId.isEmpty) {
       showErrorToast(context, 'User not signed in or no farm selected');
       return;
     }
 
     try {
-      final farmRef = FirebaseFirestore.instance
+      // 1️⃣ Firestore attempt
+      final col = FirebaseFirestore.instance
           .collection('users')
           .doc(user.uid)
           .collection('farms')
-          .doc(farmId);
+          .doc(farmId)
+          .collection('crops');
 
-      final snapshot = await farmRef.get();
-      final data = snapshot.data() ?? {};
+      final snap = await col.get();
 
-      final farmCrops = (data['crops'] as List<dynamic>? ?? [])
-          .cast<Map<String, dynamic>>();
-      setState(() {
-        crops = List<PlantInfo>.generate(farmCrops.length, (i) {
-          final m = farmCrops[i];
-          //Try to get a Timestamp, else null
-          final Timestamp? ts = m['timePlanted'] as Timestamp?;
-          final DateTime plantedDate = ts?.toDate() ?? DateTime.now();
-          final daysSince = DateTime.now().difference(plantedDate).inDays;
-          return PlantInfo(
-            farmCrops[i]['name'] as String,
-            farmCrops[i]['isGrowing'] as bool,
-            daysSince,
-            farmCrops[i]['growthStage'] as int,
-          );
+      // convert each doc → map + PlantInfo
+      final freshHiveList = <Map<String, dynamic>>[];
+      final freshInfos = <PlantInfo>[];
+
+      for (final doc in snap.docs) {
+        final m = doc.data();
+        final cropId = doc.id;
+        final name = m['name'] as String? ?? '';
+        final isGrowing = m['isGrowing'] as bool? ?? false;
+        final growthStage = m['growthStage'] as int? ?? 0;
+
+        // Firestore stores timePlanted as DateTime (v2) or Timestamp (v1)
+        DateTime plantedDate;
+        final raw = m['timePlanted'];
+        if (raw is DateTime) {
+          plantedDate = raw;
+        } else if (raw is Timestamp) {
+          plantedDate = raw.toDate();
+        } else {
+          plantedDate = DateTime.now();
+        }
+        final daysSince = DateTime.now().difference(plantedDate).inDays;
+
+        // collect for UI
+        freshInfos.add(
+          PlantInfo(name, isGrowing, daysSince, growthStage, cropId),
+        );
+
+        // collect for Hive (store millis since epoch)
+        freshHiveList.add({
+          'cropId': cropId,
+          'name': name,
+          'isGrowing': isGrowing,
+          'growthStage': growthStage,
+          'timePlanted': plantedDate.millisecondsSinceEpoch,
         });
-      });
+      }
+
+      // write into Hive for offline
+      await box.put('crops', freshHiveList);
+      await box.put('numOfCrops', freshHiveList.length);
+
+      // update UI
       setState(() {
+        crops = freshInfos;
         _isLoadingInitialData = false;
       });
     } catch (e) {
+      // 🔄 fallback to Hive
+      final rawList =
+          box.get('crops', defaultValue: <Map<String, dynamic>>[]) as List;
+      final infos = <PlantInfo>[];
+      for (final e in rawList) {
+        final m = Map<String, dynamic>.from(e as Map);
+        final name = m['name'] as String? ?? '';
+        final isGrowing = m['isGrowing'] as bool? ?? false;
+        final growthStage = m['growthStage'] as int? ?? 0;
+        final cropId = m['cropId'] as String? ?? '';
+
+        final millis = m['timePlanted'] as int?;
+        final plantedDate = millis != null
+            ? DateTime.fromMillisecondsSinceEpoch(millis)
+            : DateTime.now();
+        final daysSince = DateTime.now().difference(plantedDate).inDays;
+
+        infos.add(PlantInfo(name, isGrowing, daysSince, growthStage, cropId));
+      }
+
       if (!mounted) return;
-      showErrorToast(context, 'Failed to fetch farm data: $e');
-    } finally {
+      showErrorToast(context, 'Offline: loaded crops from local storage.');
       setState(() {
+        crops = infos;
         _isLoadingInitialData = false;
       });
     }
@@ -246,6 +325,14 @@ class _PlantsTabState extends State<PlantsTab>
     double width = MediaQuery.of(context).size.width / 1.11;
     double height = MediaQuery.of(context).size.width / 1.4;
     final farmId = myBox.get('farmId') as String? ?? '';
+
+    if (_isLoadingInitialData) {
+      return SizedBox(
+        height: height,
+        width: width,
+        child: Center(child: CircularProgressIndicator()),
+      );
+    }
 
     if (farmId.isEmpty) {
       return Column(
@@ -310,6 +397,7 @@ class _PlantsTabState extends State<PlantsTab>
             m['isGrowing'] as bool,
             daysSince,
             m['growthStage'] as int,
+            m['cropId'] as String,
           );
         });
 
@@ -358,10 +446,17 @@ class _PlantsTabState extends State<PlantsTab>
 }
 
 class PlantInfo {
-  PlantInfo(this.name, this.isGrowing, this.timeOfPlant, this.plantStage);
+  PlantInfo(
+    this.name,
+    this.isGrowing,
+    this.timeOfPlant,
+    this.plantStage,
+    this.cropId,
+  );
 
-  String name;
-  bool isGrowing;
-  int timeOfPlant;
-  int plantStage;
+  final String name;
+  final bool isGrowing;
+  final int timeOfPlant;
+  final int plantStage;
+  final String cropId;
 }
