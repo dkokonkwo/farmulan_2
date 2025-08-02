@@ -30,7 +30,7 @@ void main() async {
     await Firebase.initializeApp();
 
     await FirebaseAppCheck.instance.activate(
-      androidProvider: AndroidProvider.debug,
+      androidProvider: AndroidProvider.playIntegrity,
       // For iOS: iosProvider: IosProvider.appAttest,
       // webProvider: ReCaptchaV3Provider('your-site-key'), // if you're using web
     );

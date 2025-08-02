@@ -1,8 +1,19 @@
+````markdown
 # Farmulan 2
 
-## LINK TO DEMO VIDEO: [https://drive.google.com/file/d/17dsf9IUm-cG2yG\_PU2prHnpHq\_Y7OTsa/view?usp=sharing](https://drive.google.com/file/d/17dsf9IUm-cG2yG_PU2prHnpHq_Y7OTsa/view?usp=sharing)
+## LINK TO DEMO VIDEO: [https://drive.google.com/file/d/1njG8iUwFdbK3KjjRQGCBr8pGUVTXlkbL/view?usp=sharing](https://drive.google.com/file/d/1njG8iUwFdbK3KjjRQGCBr8pGUVTXlkbL/view?usp=sharing)
 
-## LINK TO GITHUB REPOSITORY: [https://github.com/dkokonkwo/farmulan\_2.git](https://github.com/dkokonkwo/farmulan_2.git)
+## LINK TO FLUTTER REPOSITORY: [https://github.com/dkokonkwo/farmulan_2.git](https://github.com/dkokonkwo/farmulan_2.git)
+
+## LINK TO HARDWARE CODE REPOSITORY: [https://github.com/dkokonkwo/farmulan_hardware.git](https://github.com/dkokonkwo/farmulan_hardware.git)
+
+## APK LOCATION
+
+The Android APK for Farmulan 2 is available in the root directory of this repository:
+
+```bash
+farmulan.apk
+````
 
 ## Project Overview
 
@@ -20,8 +31,8 @@ Before you begin, ensure you have the following installed on your system:
 * **Git:** For cloning the repository.
 * **An IDE (Integrated Development Environment):**
 
-    * [Visual Studio Code](https://code.visualstudio.com/) with the Flutter extension.
-    * [Android Studio](https://developer.android.com/studio) with the Flutter plugin.
+  * [Visual Studio Code](https://code.visualstudio.com/) with the Flutter extension.
+  * [Android Studio](https://developer.android.com/studio) with the Flutter plugin.
 * **Android SDK (if targeting Android):** Usually comes with Android Studio.
 * **Xcode (if targeting iOS):** Required for iOS development on macOS.
 
@@ -48,9 +59,9 @@ Follow these steps to get your project up and running:
 
 1. **Start an Emulator/Simulator or Connect a Device:**
 
-    * **Android Emulator:** Open Android Studio → Tools > Device Manager → start a virtual device.
-    * **iOS Simulator (macOS only):** Open Xcode → Xcode > Open Developer Tool > Simulator.
-    * **Physical Device:** Enable USB debugging on Android or Developer Mode on iOS, then connect via USB.
+   * **Android Emulator:** Open Android Studio → Tools > Device Manager → start a virtual device.
+   * **iOS Simulator (macOS only):** Open Xcode → Xcode > Open Developer Tool > Simulator.
+   * **Physical Device:** Enable USB debugging on Android or Developer Mode on iOS, then connect via USB.
 
 2. **Verify Connected Devices:**
 
@@ -70,12 +81,12 @@ Follow these steps to connect the Flutter frontend with the Firebase backend (Fi
 
 1. **Set Up Firebase Project**
 
-    * In the [Firebase Console](https://console.firebase.google.com/), create or select your project.
-    * Enable **Cloud Firestore** and **Cloud Functions** in the console.
-    * Add Android and/or iOS apps in **Project Settings > General**, then download:
+   * In the [Firebase Console](https://console.firebase.google.com/), create or select your project.
+   * Enable **Cloud Firestore** and **Cloud Functions** in the console.
+   * Add Android and/or iOS apps in **Project Settings > General**, then download:
 
-        * `google-services.json` → place under `android/app/`
-        * `GoogleService-Info.plist` → place under `ios/Runner/`
+     * `google-services.json` → place under `android/app/`
+     * `GoogleService-Info.plist` → place under `ios/Runner/`
 
 2. **Install Firebase Packages**
    Add to `pubspec.yaml`:
@@ -114,8 +125,8 @@ Follow these steps to connect the Flutter frontend with the Firebase backend (Fi
 
 4. **Configure Firestore Collections**
 
-    * **sensors**: stores real-time readings (temperature, humidity, radiation, soil moisture).
-    * **schedules**: holds computed ET₀, Kc, and next irrigation time for each plot.
+   * **sensors**: stores real-time readings (temperature, humidity, radiation, soil moisture).
+   * **schedules**: holds computed ET₀, Kc, and next irrigation time for each plot.
 
    Example usage in Flutter:
 
@@ -139,8 +150,8 @@ Follow these steps to connect the Flutter frontend with the Firebase backend (Fi
    npx firebase deploy --only functions
    ```
 
-    * **computeEt0**: triggers on weather updates to calculate ET₀.
-    * **scheduleIrrigation**: HTTP function to update irrigation schedules on demand.
+   * **computeEt0**: triggers on weather updates to calculate ET₀.
+   * **scheduleIrrigation**: HTTP function to update irrigation schedules on demand.
 
 6. **Calling Functions from Flutter**
 
@@ -153,9 +164,7 @@ Follow these steps to connect the Flutter frontend with the Firebase backend (Fi
 
 7. **Logging & Overrides**
 
-    * Use Firestore snapshots for real-time UI updates.
-    * Log manual overrides in a subcollection `schedules/{plotId}/overrides`.
+   * Use Firestore snapshots for real-time UI updates.
+   * Log manual overrides in a subcollection `schedules/{plotId}/overrides`.
 
 ---
-
-Enjoy developing with Farmulan!

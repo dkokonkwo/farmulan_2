@@ -1,6 +1,6 @@
 import 'package:farmulan/farm/chart_dropdown.dart';
 import 'package:farmulan/farm/plant_data.dart';
-import 'package:farmulan/utils/constants/bar_chart.dart';
+import 'package:farmulan/farm/updated_bar_chart.dart';
 import 'package:flutter/material.dart' hide BoxDecoration, BoxShadow;
 import 'package:flutter_inset_box_shadow/flutter_inset_box_shadow.dart';
 
@@ -120,22 +120,23 @@ class _ToggleChartState extends State<ToggleChart> {
                       ),
                       child: Text(
                         value,
-                        style:  TextStyle(
-                            fontSize: 15,
-                            fontWeight: isSelected
-                                ? FontWeight.bold
-                                : FontWeight.normal,
-                            color: AppColors.regularText,
-                          ),
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: isSelected
+                              ? FontWeight.bold
+                              : FontWeight.normal,
+                          color: AppColors.regularText,
                         ),
                       ),
+                    ),
                   );
                 }).toList(),
               ),
             ],
           ),
           SizedBox(height: 8),
-          SensorBarChart(data: weeklyData[currentData]),
+          // SensorBarChart(data: weeklyData[currentData]),
+          UpdatedBarChart(),
         ],
       ),
     );

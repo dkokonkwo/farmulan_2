@@ -44,11 +44,13 @@ class _AddCropButtonState extends State<AddCropButton> {
       final stages = (result.data as Map<String, dynamic>)['stages'] as List;
       // You can now use `stages` locally if needed, or just trust that it got written server‑side.
     } on FirebaseFunctionsException catch (e) {
+      if (!mounted) return;
       showErrorToast(context, 'Error building crop stages: ${e.message}');
-      print(e);
+      debugPrint('${e.message}');
     } catch (e) {
+      if (!mounted) return;
       showErrorToast(context, 'Unknown error building stages: $e');
-      print(e);
+      debugPrint('Error: $e');
     }
   }
 

@@ -92,7 +92,7 @@ class _BarChartState extends State<_BarChart> {
       });
     } catch (e) {
       // Handle potential errors during data loading or parsing
-      print('Error loading or parsing sensor data: $e');
+      debugPrint('Error loading or parsing sensor data: $e');
       if (mounted) {
         setState(() {
           _sensorValues = []; // Set to empty list to show empty chart

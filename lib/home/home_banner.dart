@@ -38,7 +38,7 @@ class _HomeBannerState extends State<HomeBanner> {
     // 1. Get farm ID/name
     final name = box.get('firstName') as String? ?? '';
     if (name.isNotEmpty) {
-      print('name: $name');
+      debugPrint('name: $name');
       setState(() {
         _userName = name;
       });
@@ -46,7 +46,7 @@ class _HomeBannerState extends State<HomeBanner> {
 
     final storedFarmId = await box.get('farmId');
     final firstName = await box.get('firstName') as String;
-    print('first name : $firstName');
+    debugPrint('first name : $firstName');
     if (storedFarmId is String && storedFarmId.isNotEmpty) {
       setState(() {
         _farmId = hashToNumber(storedFarmId).toString();
